@@ -3,10 +3,9 @@
 #include <string>
 
 class BankAccount {
- public:  // Correctly indented and blank line added before public
-    BankAccount(std::string name, double initialBalance) {
-        accountHolder = name;
-        balance = initialBalance;
+ public:
+    BankAccount(const std::string& name, double initialBalance)
+        : accountHolder(name), balance(initialBalance) {
     }
 
     void deposit(double amount) {
@@ -15,8 +14,8 @@ class BankAccount {
             return;
         }
         balance += amount;
-        std::cout << "Deposited: $" << amount << " -> balance: $" << balance
-                  << std::endl;  // Line wrapped to <= 80 chars
+        std::cout << "Deposited: $" << amount
+                  << " -> balance: $" << balance << std::endl;
     }
 
     void withdraw(double amount) {
@@ -38,7 +37,7 @@ class BankAccount {
                   << ", Balance: $" << balance << std::endl;
     }
 
- private:  // Correctly placed and indented
+ private:
     std::string accountHolder;
     double balance;
 };
