@@ -9,38 +9,34 @@ on:
 
 jobs:
   lint-and-analyze:
-    runs-on: windows-latest   # Can also use windows-latest if you prefer
+    runs-on: ubuntu-latest   # ✅ Use Ubuntu
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Install cpplint (Python package)
       - name: Install cpplint
         run: pip install cpplint
 
-      # Install cppcheck (static analyzer)
       - name: Install cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
-      # Run cpplint on all C++ files
-      - name: Run cpplint
+      - name: Run cpplint on .cpp files
         run: |
           echo "🔍 Running cpplint..."
-          files=$(find . -name "*.cpp" )
+          files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
-            echo "✅ No C++ files found."
+            echo "✅ No .cpp files found."
           else
             cpplint $files
           fi
 
-      # Run cppcheck on all C++ files
-      - name: Run cppcheck
+      - name: Run cppcheck on .cpp files
         run: |
           echo "🔍 Running cppcheck..."
-          files=$(find . -name "*.cpp" )
+          files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
-            echo "✅ No C++ files found."
+            echo "✅ No .cpp files found."
           else
             cppcheck --enable=all --error-exitcode=1 $files
           fi
