@@ -1,85 +1,86 @@
+//copyright 2025 Balu
 #include <iostream>
 #include <string>
-using namespace std;
+
 
 class BankAccount {
 private:
-    string accountHolder;
+    std::string accountHolder;
     double balance;
 
 public:
-    BankAccount(string name, double initialBalance) {
+    BankAccount(std::string name, double initialBalance) {
         accountHolder = name;
         balance = initialBalance;
     }
 
     void deposit(double amount) {
         if (amount <= 0) {
-            cout << "Deposit amount must be positive!" << endl;
+            std::cout << "Deposit amount must be positive!" << std::endl;
             return;
         }
         balance += amount;
-        cout << "Deposited: $" << amount << " -> balance: $" << balance << endl;
+        std::cout << "Deposited: $" << amount << " -> balance: $" << balance << std::endl;
     }
 
     void withdraw(double amount) {
         if (amount <= 0) {
-            cout << "Withdrawal amount must be positive!" << endl;
+            std::cout << "Withdrawal amount must be positive!" << std::endl;
             return;
         }
         if (amount > balance) {
-            cout << "Insufficient funds!" << endl;
+            std::cout << "Insufficient funds!" << std::endl;
         } else {
             balance -= amount;
-            cout << "Withdrawn: $" << amount << " -> Remaining balance: $" << balance << endl;
+            std::cout << "Withdrawn: $" << amount << " -> Remaining balance: $" << balance << std::endl;
         }
     }
 
     void displayBalance() {
-        cout << "Account Holder: " << accountHolder
-             << ", Balance: $" << balance << endl;
+        std::cout << "Account Holder: " << accountHolder
+             << ", Balance: $" << balance << std::endl;
     }
 };
 
 int main() {
-    string name;
-    cout<<"Enter Your Name: ";
-    cin>>name;
+    std::string name;
+    std::cout<<"Enter Your Name: ";
+    std::cin>>name;
     BankAccount myAccount(name, 1000);
     int choice;  
 
     while (choice != 4) {
-        cout << "\nMenu:\n";
-        cout << "1 - Balance Enquiry\n";
-        cout << "2 - Deposit Amount\n";
-        cout << "3 - Withdraw Amount\n";
-        cout << "4 - Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
+        std::cout << "\nMenu:\n";
+        std::cout << "1 - Balance Enquiry\n";
+        std::cout << "2 - Deposit Amount\n";
+        std::cout << "3 - Withdraw Amount\n";
+        std::cout << "4 - Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
 
         switch (choice) {
             case 1:
                 myAccount.displayBalance();
                 break;
             case 2: {
-                cout << "Enter amount to deposit: ";
+                std::cout << "Enter amount to deposit: ";
                 double depositamount;
-                cin >> depositamount;
+                std::cin >> depositamount;
                 myAccount.deposit(depositamount);
                 break;
             }
             case 3: {
-                cout << "Enter amount to withdraw: ";
+                std::cout << "Enter amount to withdraw: ";
                 double withdrawamount;
-                cin >> withdrawamount;
+                std::cin >> withdrawamount;
                 myAccount.withdraw(withdrawamount);
                 break;
             }
             case 4:
-                cout << "Thank you \n";
+                std::cout << "Thank you \n";
                 break;
             default:
-                cout << "Invalid choice! Please try again.\n";
+                std::cout << "Invalid choice! Please try again.\n";
         }
     }
 
