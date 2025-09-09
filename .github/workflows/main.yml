@@ -1,39 +1,46 @@
-name: C++ Lint and Static Analysis
+name: C++ Code Quality Checks
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - feature/**
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   lint-and-analyze:
-    runs-on: windows-latest
+    runs-on: windows-latest   # Can also use windows-latest if you prefer
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install cpplint via pip
-        shell: powershell
+      # Install cpplint (Python package)
+      - name: Install cpplint
+        run: pip install cpplint
+
+      # Install cppcheck (static analyzer)
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      # Run cpplint on all C++ files
+      - name: Run cpplint
         run: |
-          python -m pip install --upgrade pip
-          pip install cpplint
+          echo "🔍 Running cpplint..."
+          files=$(find . -name "*.cpp" )
+          if [ -z "$files" ]; then
+            echo "✅ No C++ files found."
+          else
+            cpplint $files
+          fi
 
-      - name: Download and install cppcheck
-        shell: powershell
+      # Run cppcheck on all C++ files
+      - name: Run cppcheck
         run: |
-          Invoke-WebRequest -Uri "https://github.com/danmar/cppcheck/releases/download/2.13.0/cppcheck-2.13.0-x64-Setup.exe" -OutFile "cppcheck-installer.exe"
-          Start-Process -FilePath .\cppcheck-installer.exe -ArgumentList "/S" -Wait
-
-      - name: Add cppcheck to PATH
-        shell: powershell
-        run: echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Run cpplint on C++ files
-        shell: powershell
-        run: cpplint --filter=-legal/copyright *.cpp
-
-      - name: Run cppcheck on C++ files
-        shell: powershell
-        run: cppcheck --enable=all --inconclusive --std=c++11 --quiet .
+          echo "🔍 Running cppcheck..."
+          files=$(find . -name "*.cpp" )
+          if [ -z "$files" ]; then
+            echo "✅ No C++ files found."
+          else
+            cppcheck --enable=all --error-exitcode=1 $files
+          fi
