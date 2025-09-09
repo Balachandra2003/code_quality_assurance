@@ -30,5 +30,14 @@ jobs:
           else
             cpplint $files
           fi
+      - name: Run cppcheck on .cpp files
+        run: |
+          echo "🔍 Running cppcheck..."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp files found."
+          else
+            cppcheck --enable=all --error-exitcode=1 $files
+          fi  
 
       
