@@ -1,18 +1,19 @@
-//copyright 2025 Balu
+// copyright 2025 Balu
 #include <iostream>
 #include <string>
 
 
 class BankAccount {
-private:
-    std::string accountHolder;
-    double balance;
 
-public:
-    BankAccount(std::string name, double initialBalance) {
-        accountHolder = name;
-        balance = initialBalance;
-    }
+    private:
+        std::string accountHolder;
+        double balance;
+
+    public:
+        BankAccount(std::string name, double initialBalance) {
+            accountHolder = name;
+            balance = initialBalance;
+        }
 
     void deposit(double amount) {
         if (amount <= 0) {
@@ -20,25 +21,25 @@ public:
             return;
         }
         balance += amount;
-        std::cout << "Deposited: $" << amount << " -> balance: $" << balance << std::endl;
+        std::cout<<"Deposited: $"<<amount<<" -> balance: $"<<balance<< std::endl;
     }
 
     void withdraw(double amount) {
         if (amount <= 0) {
-            std::cout << "Withdrawal amount must be positive!" << std::endl;
+            std::cout<<"Withdrawal amount must be positive!"<<std::endl;
             return;
         }
         if (amount > balance) {
             std::cout << "Insufficient funds!" << std::endl;
         } else {
             balance -= amount;
-            std::cout << "Withdrawn: $" << amount << " -> Remaining balance: $" << balance << std::endl;
+            std::cout<<"Withdrawn: $"<<amount<<" -> Remaining balance: $"<<balance<<std::endl;
         }
     }
 
     void displayBalance() {
-        std::cout << "Account Holder: " << accountHolder
-             << ", Balance: $" << balance << std::endl;
+        std::cout<<"Account Holder: "<<accountHolder
+             << ", Balance: $" << balance<<std::endl;
     }
 };
 
@@ -80,7 +81,7 @@ int main() {
                 std::cout << "Thank you \n";
                 break;
             default:
-                std::cout << "Invalid choice! Please try again.\n";
+                std::cout<<"Invalid choice! Please try again.\n";
         }
     }
 
