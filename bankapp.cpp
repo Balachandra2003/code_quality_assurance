@@ -2,18 +2,12 @@
 #include <iostream>
 #include <string>
 
-
 class BankAccount {
-
-    private:
-        std::string accountHolder;
-        double balance;
-
-    public:
-        BankAccount(std::string name, double initialBalance) {
-            accountHolder = name;
-            balance = initialBalance;
-        }
+ public:  // Correctly indented and blank line added before public
+    BankAccount(std::string name, double initialBalance) {
+        accountHolder = name;
+        balance = initialBalance;
+    }
 
     void deposit(double amount) {
         if (amount <= 0) {
@@ -21,34 +15,41 @@ class BankAccount {
             return;
         }
         balance += amount;
-        std::cout<<"Deposited: $"<<amount<<" -> balance: $"<<balance<< std::endl;
+        std::cout << "Deposited: $" << amount << " -> balance: $" << balance
+                  << std::endl;  // Line wrapped to <= 80 chars
     }
 
     void withdraw(double amount) {
         if (amount <= 0) {
-            std::cout<<"Withdrawal amount must be positive!"<<std::endl;
+            std::cout << "Withdrawal amount must be positive!" << std::endl;
             return;
         }
         if (amount > balance) {
             std::cout << "Insufficient funds!" << std::endl;
         } else {
             balance -= amount;
-            std::cout<<"Withdrawn: $"<<amount<<" -> Remaining balance: $"<<balance<<std::endl;
+            std::cout << "Withdrawn: $" << amount
+                      << " -> Remaining balance: $" << balance << std::endl;
         }
     }
 
     void displayBalance() {
-        std::cout<<"Account Holder: "<<accountHolder
-             << ", Balance: $" << balance<<std::endl;
+        std::cout << "Account Holder: " << accountHolder
+                  << ", Balance: $" << balance << std::endl;
     }
+
+ private:  // Correctly placed and indented
+    std::string accountHolder;
+    double balance;
 };
 
 int main() {
     std::string name;
-    std::cout<<"Enter Your Name: ";
-    std::cin>>name;
+    std::cout << "Enter Your Name: ";
+    std::cin >> name;
+
     BankAccount myAccount(name, 1000);
-    int choice;  
+    int choice = 0;
 
     while (choice != 4) {
         std::cout << "\nMenu:\n";
@@ -65,23 +66,23 @@ int main() {
                 break;
             case 2: {
                 std::cout << "Enter amount to deposit: ";
-                double depositamount;
-                std::cin >> depositamount;
-                myAccount.deposit(depositamount);
+                double depositAmount;
+                std::cin >> depositAmount;
+                myAccount.deposit(depositAmount);
                 break;
             }
             case 3: {
                 std::cout << "Enter amount to withdraw: ";
-                double withdrawamount;
-                std::cin >> withdrawamount;
-                myAccount.withdraw(withdrawamount);
+                double withdrawAmount;
+                std::cin >> withdrawAmount;
+                myAccount.withdraw(withdrawAmount);
                 break;
             }
             case 4:
-                std::cout << "Thank you \n";
+                std::cout << "Thank you\n";
                 break;
             default:
-                std::cout<<"Invalid choice! Please try again.\n";
+                std::cout << "Invalid choice! Please try again.\n";
         }
     }
 
