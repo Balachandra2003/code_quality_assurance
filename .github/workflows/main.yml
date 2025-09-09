@@ -38,5 +38,5 @@ jobs:
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
           else
-            cppcheck --enable=all --inconclusive --std=c++11 --suppress=missingIncludeSystem
+            cppcheck --enable=all --inconclusive --std=c++11 --suppress=missingIncludeSystem --error-exitcode=2
           fi
