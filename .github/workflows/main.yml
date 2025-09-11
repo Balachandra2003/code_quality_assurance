@@ -9,41 +9,34 @@ on:
 
 jobs:
   lint-and-analyze:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Python and pip
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
       - name: Install cpplint
         run: pip install cpplint
 
       - name: Install cppcheck
-        run: choco install cppcheck --no-progress -y
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
 
       - name: Run cpplint on .cpp files
-        shell: powershell
         run: |
-          Write-Host "🔍 Running cpplint..."
-          $files = Get-ChildItem -Recurse -Filter *.cpp | ForEach-Object { $_.FullName }
-          if ($files.Count -eq 0) {
-            Write-Host "✅ No .cpp files found."
-          } else {
+          echo "🔍 Running cpplint..."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp files found."
+          else
             cpplint $files
-          }
+          fi
 
       - name: Run cppcheck on .cpp files (Relaxed)
-        shell: powershell
         run: |
-          Write-Host "🔍 Running cppcheck (relaxed)..."
-          $files = Get-ChildItem -Recurse -Filter *.cpp | ForEach-Object { $_.FullName }
-          if ($files.Count -eq 0) {
-            Write-Host "✅ No .cpp files found."
-          } else {
+          echo "🔍 Running cppcheck (relaxed)..."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp files found."
+          else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
-          }
+          fi
