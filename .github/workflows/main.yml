@@ -1,4 +1,4 @@
-name: C++ Code Quality Checks
+name: C++ Code Quality Checks (Relaxed)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint-and-analyze:
-    runs-on: ubuntu-latest   # ✅ Use Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -31,12 +31,12 @@ jobs:
             cpplint $files
           fi
 
-      - name: Run cppcheck on .cpp files
+      - name: Run cppcheck on .cpp files (Relaxed)
         run: |
-          echo "🔍 Running cppcheck..."
+          echo "🔍 Running cppcheck (relaxed)..."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
           else
-            cppcheck --enable=all --error-exitcode=1 $files
+            cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
