@@ -69,16 +69,3 @@ jobs:
             flake8 $files
           fi
 
-      - name: Send failure email to developer
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          subject: GitHub Actions Pipeline Failed for Balachandra2003/code_quality_assurance
-          to: balareddy598@gmail.com
-          from: github-actions@yourdomain.com
-          html_body: |
-            <h2>🚨 Pipeline Failure Notification</h2>
-            <p>The GitHub Actions pipeline for repository <b>Balachandra2003/code_quality_assurance</b> has failed.</p>
-            <p><b>Branch:</b> refs/heads/main</p>
-            <p><b>Commit:</b> ${{ github.sha }}</p>
-            <p><b>Error:</b> flake8 found a line too long at <code>git_python.py:33</code>. Please limit lines to 79 characters.</p>
