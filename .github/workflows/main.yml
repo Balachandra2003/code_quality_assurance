@@ -78,8 +78,7 @@ jobs:
           subject: GitHub Actions Pipeline Failed for ${{ github.repository }}
           to: ${{ secrets.DEV_EMAIL }}
           from: 'github-actions@yourdomain.com'
-          content_type: text/html
-          body: |
+          html_body: |
             <h2>🚨 Pipeline Failure Notification</h2>
             <p>The GitHub Actions pipeline for repository <b>${{ github.repository }}</b> has failed.</p>
             <p><b>Branch:</b> ${{ github.ref }}</p>
