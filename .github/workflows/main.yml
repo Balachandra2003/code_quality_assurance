@@ -11,12 +11,6 @@ jobs:
   lint-and-analyze:
     runs-on: ubuntu-latest
 
-    env:
-      CPPLINT_EXIT_CODE: 0
-      CPPCHECK_EXIT_CODE: 0
-      PYLINT_EXIT_CODE: 0
-      FLAKE8_EXIT_CODE: 0
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,7 +55,7 @@ jobs:
         run: echo "cppcheck_exit_code=$?" >> $GITHUB_ENV
         if: always()
 
-      - name: Set up Python 
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -105,20 +99,21 @@ jobs:
 
       - name: Fail job if any linting tool failed
         run: |
-          if [[ "$cpplint_exit_code" != "0" ]]; then
-            echo "cpplint failed with exit code $cpplint_exit_code"
+          FAILED=0
+          if [[ "${{ env.cpplint_exit_code }}" != "0" ]]; then
+            echo "cpplint failed with exit code ${{ env.cpplint_exit_code }}"
             FAILED=1
           fi
-          if [[ "$cppcheck_exit_code" != "0" ]]; then
-            echo "cppcheck failed with exit code $cppcheck_exit_code"
+          if [[ "${{ env.cppcheck_exit_code }}" != "0" ]]; then
+            echo "cppcheck failed with exit code ${{ env.cppcheck_exit_code }}"
             FAILED=1
           fi
-          if [[ "$pylint_exit_code" != "0" ]]; then
-            echo "pylint failed with exit code $pylint_exit_code"
+          if [[ "${{ env.pylint_exit_code }}" != "0" ]]; then
+            echo "pylint failed with exit code ${{ env.pylint_exit_code }}"
             FAILED=1
           fi
-          if [[ "$flake8_exit_code" != "0" ]]; then
-            echo "flake8 failed with exit code $flake8_exit_code"
+          if [[ "${{ env.flake8_exit_code }}" != "0" ]]; then
+            echo "flake8 failed with exit code ${{ env.flake8_exit_code }}"
             FAILED=1
           fi
           if [[ "$FAILED" == "1" ]]; then
@@ -128,6 +123,7 @@ jobs:
             echo "All linters passed successfully."
           fi
         shell: bash
+
       - name: Send failure email to developer
         if: failure()
         uses: dawidd6/action-send-mail@v3
