@@ -73,8 +73,9 @@ jobs:
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
+          server_address: 146.215.120.35
+          server_port: 25
+          secure: false
           subject: GitHub Actions Pipeline Failed for ${{ github.repository }}
           to: ${{ secrets.DEV_EMAIL }}
           from: 'github-actions@yourdomain.com'
