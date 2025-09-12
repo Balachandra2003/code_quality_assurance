@@ -36,7 +36,7 @@ jobs:
           echo "🔍 Running cppcheck..."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
-            echo "✅ No .cpp files found."
+            echo "✅ No .cpp file found."
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
