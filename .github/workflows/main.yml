@@ -128,3 +128,19 @@ jobs:
             echo "All linters passed successfully."
           fi
         shell: bash
+      - name: Send failure email to developer
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          subject: GitHub Actions Pipeline Failed for ${{ github.repository }}
+          to: ${{ secrets.DEV_EMAIL }}
+          from: 'github-actions@yourdomain.com'
+          content_type: text/html
+          body: |
+            <h2>🚨 Pipeline Failure Notification</h2>
+            <p>The GitHub Actions pipeline for repository <b>${{ github.repository }}</b> has failed.</p>
+            <p><b>Branch:</b> ${{ github.ref }}</p>
+            <p><b>Commit:</b> ${{ github.sha }}</p>
+            <p>Please check the details at: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">Pipeline Logs</a></p>
