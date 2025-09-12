@@ -1,4 +1,4 @@
-name: C++ Code Quality Checks (Relaxed)
+name: C++ and Python Code Quality Checks
 
 on:
   push:
@@ -11,6 +11,12 @@ jobs:
   lint-and-analyze:
     runs-on: ubuntu-latest
 
+    env:
+      CPPLINT_EXIT_CODE: 0
+      CPPCHECK_EXIT_CODE: 0
+      PYLINT_EXIT_CODE: 0
+      FLAKE8_EXIT_CODE: 0
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,21 +28,119 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
       - name: Run cpplint on .cpp files
+        id: cpplint
+        continue-on-error: true
         run: |
           echo "🔍 Running cpplint..."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
+            exit 0
           else
             cpplint $files
           fi
+        shell: bash
+      - name: Save cpplint exit code
+        run: echo "cpplint_exit_code=$?" >> $GITHUB_ENV
+        if: always()
 
-      - name: Run cppcheck on .cpp files (Relaxed)
+      - name: Run cppcheck on .cpp files
+        id: cppcheck
+        continue-on-error: true
         run: |
-          echo "🔍 Running cppcheck (relaxed)..."
+          echo "🔍 Running cppcheck..."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
+            exit 0
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
+        shell: bash
+      - name: Save cppcheck exit code
+        run: echo "cppcheck_exit_code=$?" >> $GITHUB_ENV
+        if: always()
+
+      - name: Set up Python 
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install pylint and flake8
+        run: pip install pylint flake8
+
+      - name: Run pylint on Python files
+        id: pylint
+        continue-on-error: true
+        run: |
+          echo "🔍 Running pylint..."
+          files=$(find . -name "*.py")
+          if [ -z "$files" ]; then
+            echo "✅ No Python files found."
+            exit 0
+          else
+            pylint $files
+          fi
+        shell: bash
+      - name: Save pylint exit code
+        run: echo "pylint_exit_code=$?" >> $GITHUB_ENV
+        if: always()
+
+      - name: Run flake8 on Python files
+        id: flake8
+        continue-on-error: true
+        run: |
+          echo "🔍 Running flake8..."
+          files=$(find . -name "*.py")
+          if [ -z "$files" ]; then
+            echo "✅ No Python files found."
+            exit 0
+          else
+            flake8 $files
+          fi
+        shell: bash
+      - name: Save flake8 exit code
+        run: echo "flake8_exit_code=$?" >> $GITHUB_ENV
+        if: always()
+
+      - name: Fail job if any linting tool failed
+        run: |
+          if [[ "$cpplint_exit_code" != "0" ]]; then
+            echo "cpplint failed with exit code $cpplint_exit_code"
+            FAILED=1
+          fi
+          if [[ "$cppcheck_exit_code" != "0" ]]; then
+            echo "cppcheck failed with exit code $cppcheck_exit_code"
+            FAILED=1
+          fi
+          if [[ "$pylint_exit_code" != "0" ]]; then
+            echo "pylint failed with exit code $pylint_exit_code"
+            FAILED=1
+          fi
+          if [[ "$flake8_exit_code" != "0" ]]; then
+            echo "flake8 failed with exit code $flake8_exit_code"
+            FAILED=1
+          fi
+          if [[ "$FAILED" == "1" ]]; then
+            echo "::error::One or more linters failed."
+            exit 1
+          else
+            echo "All linters passed successfully."
+          fi
+        shell: bash
+      - name: Send failure email to developer
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          subject: GitHub Actions Pipeline Failed for ${{ github.repository }}
+          to: ${{ secrets.DEV_EMAIL }}
+          from: 'github-actions@yourdomain.com'
+          content_type: text/html
+          body: |
+            <h2>🚨 Pipeline Failure Notification</h2>
+            <p>The GitHub Actions pipeline for repository <b>${{ github.repository }}</b> has failed.</p>
+            <p><b>Branch:</b> ${{ github.ref }}</p>
+            <p><b>Commit:</b> ${{ github.sha }}</p>
+            <p>Please check the details at: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">Pipeline Logs</a></p>
