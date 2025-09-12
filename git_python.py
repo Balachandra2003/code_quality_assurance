@@ -30,7 +30,7 @@ class BankAccount:
 
     def display_balance(self):
         """Display the account holder's name and current balance."""
-        print(f"Account Holder:{self.account_holder}, Balance:${self.balance}")
+        print(f" Account Holder: {self.account_holder}, Balance: $ {self.balance}")
 
 
 def main():
