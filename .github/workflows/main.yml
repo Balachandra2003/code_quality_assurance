@@ -23,7 +23,7 @@ jobs:
 
       - name: Run cpplint on .cpp files
         run: |
-          echo "🔍 Running cpplint..."
+          echo "🔍 Running cpplint...."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
