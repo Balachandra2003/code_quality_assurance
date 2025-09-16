@@ -68,24 +68,3 @@ jobs:
           else
             flake8 $files
           fi
-
-      # ✅ Custom email notification on failure
-      - name: Send email on failure
-        if: failure()  
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          subject: "🚨 GitHub Actions Pipeline Failed: ${{ github.workflow }}"
-          to: ${{ secrets.DEV_EMAIL }}
-          from: "balareddy598@gmail.com"
-          body: |
-            Hello Developer,
-
-            The GitHub Actions workflow **${{ github.workflow }}** has failed.
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Run ID: ${{ github.run_id }}
-            Commit: ${{ github.sha }}
-
-            Please check the GitHub Actions logs for more details.
