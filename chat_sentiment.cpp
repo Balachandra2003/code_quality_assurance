@@ -1,32 +1,37 @@
+// copyright 2025 Balu
 #include <iostream>
 #include <string>
 #include <vector>
-using namespace std;
+// using namespace std;
 
 int main() {
     // Define positive and negative keywords
-    vector<string> positive = {"good", "happy", "great", "love", "nice", "awesome"};
-    vector<string> negative = {"bad", "sad", "angry", "hate", "worst", "ugly"};
+    std::vector<std::string>positive ={
+        "good", "happy", "great", "love", "nice", "awesome"
+    };
+    std::vector<std::string>negative ={
+        "bad", "sad", "angry", "hate", "worst", "ugly"
+    };
 
-    cout << "------ Chat Session Started ------" << endl;
-    cout << "Type 'end' anytime to stop the chat." << endl;
+    std::cout << "------ Chat Session Started ------" << std::endl;
+    std::cout << "Type 'end' anytime to stop the chat." << std::endl;
 
-    string msg;
+    std::string msg;
     int posCount = 0, negCount = 0;
-    int turn = 1; // 1 = User1, 2 = User2
+    int turn = 1;  // 1 = User1, 2 = User2
 
     while (true) {
-        cout << "User" << turn << ": ";
-        getline(cin, msg);
+        std::cout << "User" << turn << ": ";
+        getline(std::cin, msg);
 
-        if (msg == "end" || msg == "END") break; // stop chat
+        if (msg == "end" || msg == "END") break;  // stop chat
 
         // Check for positive/negative keywords
         for (auto &word : positive) {
-            if (msg.find(word) != string::npos) posCount++;
+            if (msg.find(word) != std::string::npos) posCount++;
         }
         for (auto &word : negative) {
-            if (msg.find(word) != string::npos) negCount++;
+            if (msg.find(word) != std::string::npos) negCount++;
         }
 
         // Switch turn
@@ -34,18 +39,18 @@ int main() {
     }
 
     // Show sentiment report
-    cout << "\n------ Chat Sentiment Report ------\n";
-    cout << "Positive messages count: " << posCount << endl;
-    cout << "Negative messages count: " << negCount << endl;
+    std::cout << "\n------ Chat Sentiment Report ------\n";
+    std::cout << "Positive messages count: " << posCount << std::endl;
+    std::cout << "Negative messages count: " << negCount << std::endl;
 
     if (posCount > negCount)
-        cout << "Overall Sentiment: Positive" << endl;
+        std::cout << "Overall Sentiment: Positive" << std::endl;
     else if (negCount > posCount)
-        cout << "Overall Sentiment: Negative" << endl;
+        std::cout << "Overall Sentiment: Negative" << std::endl;
     else
-        cout << "Overall Sentiment: Neutral" << endl;
+        std::cout << "Overall Sentiment: Neutral" << std::endl;
 
-    cout << "------ Chat Session Ended ------" << endl;
+    std::cout << "------ Chat Session Ended ------" << std::endl;
 
     return 0;
 }
