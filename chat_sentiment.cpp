@@ -28,10 +28,14 @@ int main() {
 
         // Check for positive/negative keywords
         for (auto &word : positive) {
-            if (msg.find(word) != std::string::npos) posCount++;
+            if (msg.find(word) != std::string::npos) {
+                posCount++;
+            }
         }
         for (auto &word : negative) {
-            if (msg.find(word) != std::string::npos) negCount++;
+            if (msg.find(word) != std::string::npos) {
+                negCount++;
+            }
         }
 
         // Switch turn
