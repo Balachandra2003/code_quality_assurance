@@ -4,7 +4,7 @@
 #include <vector>
 // using namespace std;
 
-int main(){
+int main() {
     // Define positive and negative keywords
     std::vector<std::string> positive = {
         "good", "happy", "great", "love", "nice", "awesome"};
@@ -16,22 +16,22 @@ int main(){
 
     std::string msg;
     int posCount = 0, negCount = 0;
-    int turn = 1; // 1 = User1, 2 = User2
+    int turn = 1;  // 1 = User1, 2 = User2
 
-    while (true){
+    while (true) {
         std::cout << "User" << turn << ": ";
         getline(std::cin, msg);
 
         if (msg == "end" || msg == "END")
-            break; // stop chat
+            break;  // stop chat
 
         // Check for positive/negative keywords
-        for (auto &word : positive){
+        for (auto &word : positive) {
             if (msg.find(word) != std::string::npos){
                 posCount++;
             }
         }
-        for (auto &word : negative){
+        for (auto &word : negative) {
             if (msg.find(word) != std::string::npos){
                 negCount++;
             }
