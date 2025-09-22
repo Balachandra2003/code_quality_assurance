@@ -81,4 +81,4 @@ jobs:
           echo "🔍 Running cargo clippy..."
           cd rust
           cargo clippy -- -D warnings
-          fi
+          
