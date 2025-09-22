@@ -37,6 +37,10 @@
 *.out
 *.app
 *.class
+*.lock
 
 # debug information files
 *.dwo
+
+# Rust build output
+target
