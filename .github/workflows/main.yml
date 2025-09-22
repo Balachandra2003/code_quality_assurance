@@ -81,4 +81,11 @@ jobs:
           echo "🔍 Running cargo clippy..."
           cd rust
           cargo clippy -- -D warnings
+
+      - name: Run cargo fmt
+        run: |
+          echo "🔍 Running cargo fmt..."
+          cd rust
+          cargo fmt -- --check 
+      
           
