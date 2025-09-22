@@ -79,8 +79,6 @@ jobs:
       - name: Run cargo clippy
         run: |
           echo "🔍 Running cargo clippy..."
-          if [ -f "Cargo.toml" ]; then
-            cargo clippy -- -D warnings
-          else
-            echo "✅ No Rust project (Cargo.toml not found)."
+          cd rust
+          cargo clippy -- -D warnings
           fi
