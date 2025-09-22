@@ -68,3 +68,19 @@ jobs:
           else
             flake8 $files
           fi
+
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Run cargo clippy
+        run: |
+          echo "🔍 Running cargo clippy..."
+          if [ -f "Cargo.toml" ]; then
+            cargo clippy -- -D warnings
+          else
+            echo "✅ No Rust project (Cargo.toml not found)."
+          fi
