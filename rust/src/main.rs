@@ -1,35 +1,58 @@
-use std::io;
+use std::collections::HashMap;
+use std::io::{self, Write};
 
 fn main() {
-    println!("Enter a list of numbers separated by spaces:");
+    let options = vec!["Apple", "Banana", "Cherry", "Date"];
+    let mut votes: HashMap<String, usize> = HashMap::new();
 
-    // Read input from the user
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read input");
-
-    // Split the input string and parse numbers
-    let numbers: Vec<f64> = input
-        .split_whitespace()
-        .filter_map(|s| s.parse::<f64>().ok())
-        .collect();
-
-    if numbers.is_empty() {
-        println!("No valid numbers were entered.");
-        return;
+    // Initialize vote counts
+    for option in &options {
+        votes.insert(option.to_string(), 0);
     }
 
-    // Calculate stats
-    let sum: f64 = numbers.iter().sum();
-    let count = numbers.len();
-    let average = sum / count as f64;
-    let min = numbers.iter().cloned().fold(f64::INFINITY, f64::min);
-    let max = numbers.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    println!("Welcome to the Voting System!");
+    println!("Poll question: What's your favorite fruit?");
+    println!("Options:");
+    for (i, opt) in options.iter().enumerate() {
+        println!("  {}. {}", i + 1, opt);
+    }
+    println!("Type the option number to vote, or 'q' to quit.");
 
-    // Display results
-    println!("You entered {} numbers.", count);
-    println!("Average: {:.2}", average);
-    println!("Minimum: {}", min);
-    println!("Maximum: {}", max);
+    loop {
+        print!("Your vote: ");
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        let input = input.trim();
+
+        if input.eq_ignore_ascii_case("q") {
+            println!("Voting ended. Final results:");
+            print_results(&votes);
+            break;
+        }
+
+        match input.parse::<usize>() {
+            Ok(num) if num > 0 && num <= options.len() => {
+                let choice = options[num - 1];
+                *votes.get_mut(choice).unwrap() += 1;
+                println!("You voted for: {}", choice);
+                println!("Current results:");
+                print_results(&votes);
+            }
+            _ => {
+                println!("Invalid input, please enter a valid option number or 'q' to quit.");
+            }
+        }
+    }
+}
+
+fn print_results(votes: &HashMap<String, usize>) {
+    for (option, count) in votes {
+        println!("{}: {}", option, count);
+    }
+    println!();
 }
