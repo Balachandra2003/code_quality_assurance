@@ -53,6 +53,5 @@ fn main() {
 fn print_results(votes: &HashMap<String, usize>) {
     for (option, count) in votes {
         println!("{}: {}", option, count);
-    }
-    println!();
+    }println!();
 }

@@ -16,14 +16,14 @@ int main() {
 
     std::string msg;
     int posCount = 0, negCount = 0;
-    int turn = 1;  //1 = User1, 2 = User2
+    int turn = 1;  // 1 = User1, 2 = User2
 
     while (true) {
         std::cout << "User" << turn << ": ";
         getline(std::cin, msg);
 
         if (msg == "end" || msg == "END")
-            break;  //stop chat
+            break;  // stop chat
 
         // Check for positive/negative keywords
         for (auto &word : positive) {
