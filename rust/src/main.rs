@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io::{self, Write};
 
 fn main() {
-    let options = vec!["Apple", "Banana", "Cherry", "Date"];
+    let options: Vec<&'static str> = vec!["Apple", "Banana", "Cherry", "Date"];
     let mut votes: HashMap<String, usize> = HashMap::new();
 
     // Initialize vote counts
