@@ -1,4 +1,4 @@
-
+"""Simple interactive bank account application using OOP in Python."""
 
 
 class BankAccount:
