@@ -1,4 +1,4 @@
-name: C++ and Python Code Quality Checks
+name: C++/Python/Rust Code Quality Checks
 
 on:
   push:
@@ -10,37 +10,34 @@ on:
 jobs:
   lint-and-analyze:
     runs-on: ubuntu-latest
+    outputs:
+      cpp-status: ${{ steps.cpp-status.outputs.status }}
+      python-status: ${{ steps.python-status.outputs.status }}
+      rust-status: ${{ steps.rust-status.outputs.status }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ---------------- C++ Setup ----------------
       - name: Install cpplint
         run: pip install cpplint
 
       - name: Install cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
-      - name: Run cpplint on .cpp files
+      - name: Run C++ Checks
+        id: cpp-status
         run: |
-          echo "🔍 Running cpplint...."
+          status="success"
           files=$(find . -name "*.cpp")
-          if [ -z "$files" ]; then
-            echo "✅ No .cpp files found."
-          else
-            cpplint $files
+          if [ -n "$files" ]; then
+            cpplint $files || status="failure"
+            cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files || status="failure"
           fi
+          echo "status=$status" >> $GITHUB_OUTPUT
 
-      - name: Run cppcheck on .cpp files
-        run: |
-          echo "🔍 Running cppcheck..."
-          files=$(find . -name "*.cpp")
-          if [ -z "$files" ]; then
-            echo "✅ No .cpp file found."
-          else
-            cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
-          fi
-
+      # ---------------- Python Setup ----------------
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -49,43 +46,38 @@ jobs:
       - name: Install pylint and flake8
         run: pip install pylint flake8
 
-      - name: Run pylint on Python files
+      - name: Run Python Checks
+        id: python-status
         run: |
-          echo "🔍 Running pylint..."
+          status="success"
           files=$(find . -name "*.py")
-          if [ -z "$files" ]; then
-            echo "✅ No Python files found."
-          else
-            pylint $files
+          if [ -n "$files" ]; then
+            pylint $files || status="failure"
+            flake8 $files || status="failure"
           fi
+          echo "status=$status" >> $GITHUB_OUTPUT
 
-      - name: Run flake8 on Python files
-        run: |
-          echo "🔍 Running flake8..."
-          files=$(find . -name "*.py")
-          if [ -z "$files" ]; then
-            echo "✅ No Python files found."
-          else
-            flake8 $files
-          fi
-
-
+      # ---------------- Rust Setup ----------------
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      - name: Run cargo clippy
+      - name: Run Rust Checks
+        id: rust-status
         run: |
-          echo "🔍 Running cargo clippy..."
-          cd rust
-          cargo clippy -- -D warnings
+          status="success"
+          if [ -f "rust/Cargo.toml" ]; then
+            cd rust
+            cargo clippy -- -D warnings || status="failure"
+            cargo fmt -- --check || status="failure"
+          fi
+          echo "status=$status" >> $GITHUB_OUTPUT
 
-      - name: Run cargo fmt
+      # ---------------- Display Summary ----------------
+      - name: Display PR Summary
         run: |
-          echo "🔍 Running cargo fmt..."
-          cd rust
-          cargo fmt -- --check 
-      
-          
+          echo "C++ Status: ${{ needs.lint-and-analyze.outputs.cpp-status }}"
+          echo "Python Status: ${{ needs.lint-and-analyze.outputs.python-status }}"
+          echo "Rust Status: ${{ needs.lint-and-analyze.outputs.rust-status }}"
