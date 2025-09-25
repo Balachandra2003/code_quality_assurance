@@ -49,7 +49,6 @@ int main() {
 
     BankAccount myAccount(name, 1000);
     int choice = 0;
-    int x=0;
     while (choice != 4) {
         std::cout << "\nMenu:\n";
         std::cout << "1 - Balance Enquiry\n";
