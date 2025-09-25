@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'feature/**'
+      - feature/**
   pull_request:
 
 jobs:
@@ -21,8 +21,15 @@ jobs:
       - name: Install cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
-      
-
+      - name: Run cpplint on .cpp files
+        run: |
+          echo "🔍 Running cpplint...."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp files found."
+          else
+            cpplint $files
+          fi
       - name: Run cppcheck on .cpp files
         run: |
           echo "🔍 Running cppcheck..."
@@ -32,7 +39,6 @@ jobs:
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -50,7 +56,6 @@ jobs:
           else
             pylint $files
           fi
-
       - name: Run flake8 on Python files
         run: |
           echo "🔍 Running flake8..."
@@ -60,26 +65,19 @@ jobs:
           else
             flake8 $files
           fi
-
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-          
-      - name: Install clippy
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
 
       - name: Run cargo clippy
         run: |
           echo "🔍 Running cargo clippy..."
           cd rust
           cargo clippy -- -D warnings
-
       - name: Run cargo fmt
         run: |
           echo "🔍 Running cargo fmt..."
           cd rust
-          cargo fmt -- --check
+          cargo fmt -- --check 
