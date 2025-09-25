@@ -66,6 +66,9 @@ jobs:
         with:
           toolchain: stable
           override: true
+          
+      - name: Install clippy
+        run: rustup component add clippy
 
       - name: Run cargo clippy
         run: |
