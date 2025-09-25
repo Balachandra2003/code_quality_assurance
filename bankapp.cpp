@@ -33,7 +33,8 @@ class BankAccount {
     }
 
     void displayBalance() {
-        std::cout << "Account Holder: " << accountHolder<< ", Balance: $" << balance << std::endl;
+        std::cout << "Account Holder: " << accountHolder
+                  << ", Balance: $" << balance << std::endl;
     }
 
  private:
