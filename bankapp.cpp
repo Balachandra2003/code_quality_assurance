@@ -14,7 +14,8 @@ class BankAccount {
             return;
         }
         balance += amount;
-        std::cout << "Deposited: $" << amount<< " -> balance: $" << balance << std::endl; // made line length too long
+        std::cout << "Deposited: $" << amount
+                    << " -> balance: $" << balance << std::endl;
     }
 
     void withdraw(double amount) {
