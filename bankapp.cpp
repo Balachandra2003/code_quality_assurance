@@ -14,7 +14,7 @@ class BankAccount {
             return;
         }
         balance += amount;
-        std::cout << "Deposited: $" << amount
+        std::cout << "Deposited : $" << amount
                     << " -> balance: $" << balance << std::endl;
     }
 
