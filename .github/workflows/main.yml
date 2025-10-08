@@ -1,4 +1,4 @@
-name: C++ and Python Code Quality Checks
+name: C++, Python, Rust, and Java Code Quality Checks
 
 on:
   push:
@@ -15,6 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ---------------- C++ ----------------
       - name: Install cpplint
         run: pip install cpplint
 
@@ -23,13 +24,14 @@ jobs:
 
       - name: Run cpplint on .cpp files
         run: |
-          echo "🔍 Running cpplint...."
+          echo "🔍 Running cpplint..."
           files=$(find . -name "*.cpp")
           if [ -z "$files" ]; then
             echo "✅ No .cpp files found."
           else
             cpplint $files
           fi
+
       - name: Run cppcheck on .cpp files
         run: |
           echo "🔍 Running cppcheck..."
@@ -39,6 +41,8 @@ jobs:
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
+
+      # ---------------- Python ----------------
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -56,6 +60,7 @@ jobs:
           else
             pylint $files
           fi
+
       - name: Run flake8 on Python files
         run: |
           echo "🔍 Running flake8..."
@@ -65,13 +70,15 @@ jobs:
           else
             flake8 $files
           fi
+
+      # ---------------- Rust ----------------
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      - name: Install clippy
+      - name: Install clippy and rustfmt
         run: |
           rustup component add clippy
           rustup component add rustfmt
@@ -81,8 +88,24 @@ jobs:
           echo "🔍 Running cargo clippy..."
           cd rust
           cargo clippy -- -D warnings
+
       - name: Run cargo fmt
         run: |
           echo "🔍 Running cargo fmt..."
           cd rust
-          cargo fmt -- --check 
+          cargo fmt -- --check
+
+      # ---------------- Java ----------------
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven (skip tests)
+        run: mvn -B compile -DskipTests=true
+
+      - name: Run Checkstyle
+        run: |
+          echo "🔍 Running Checkstyle..."
+          mvn checkstyle:check
