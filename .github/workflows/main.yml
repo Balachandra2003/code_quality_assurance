@@ -95,7 +95,7 @@ jobs:
           cd rust
           cargo fmt -- --check
 
-      # ---------------- Java ----------------
+            # ---------------- Java ----------------
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -103,9 +103,14 @@ jobs:
           java-version: '17'
 
       - name: Build with Maven (skip tests)
+        working-directory: java
         run: mvn -B compile -DskipTests=true
 
       - name: Run Checkstyle
+        working-directory: java
         run: |
           echo "🔍 Running Checkstyle..."
           mvn checkstyle:check
+
+      
+
