@@ -112,5 +112,12 @@ jobs:
           echo "🔍 Running Checkstyle..."
           mvn checkstyle:check
 
+      - name: Run PMD 
+        working-directory: java
+        run: |
+          echo "🔍 Running PMD "
+          mvn clean pmd:check
+
+
       
 
