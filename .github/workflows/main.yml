@@ -41,6 +41,29 @@ jobs:
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
+          
+      - name: Install Google Test dependencies
+        run: |
+          echo "⚙️ Installing Google Test..."
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make
+
+      - name: Build and Run Google Tests
+        run: |
+          echo "🧪 Running Google Tests..."
+          if [ -d "cpp" ]; then
+            cd cpp
+            if [ -f "CMakeLists.txt" ]; then
+              mkdir -p build && cd build
+              cmake ..
+              make
+              ctest --output-on-failure
+            else
+              echo "⚠️ No CMakeLists.txt found in cpp/, skipping gtest."
+            fi
+          else
+            echo "✅ No cpp directory found, skipping gtest."
+          fi
 
       # ---------------- Python ----------------
       - name: Set up Python
@@ -95,7 +118,7 @@ jobs:
           cd rust
           cargo fmt -- --check
 
-            # ---------------- Java ----------------
+      # ---------------- Java ----------------
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -110,14 +133,28 @@ jobs:
         working-directory: java
         run: |
           echo "🔍 Running Checkstyle..."
-          mvn checkstyle:check
+          set +e
+          mvn -B checkstyle:check
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ Checkstyle found issues. See log above."
+            exit 1
+          else
+            echo "✅ No Checkstyle violations."
+          fi
 
-      - name: Run PMD 
+      - name: Run PMD
         working-directory: java
         run: |
-          echo "🔍 Running PMD "
-          mvn clean pmd:check
+          echo "🔍 Running PMD..."
+          set +e
+          mvn -B pmd:check -Dpmd.verbose=true
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ PMD found violations. See details above."
+            exit 1
+          else
+            echo "✅ No PMD violations."
+          fi
 
-
-      
 
