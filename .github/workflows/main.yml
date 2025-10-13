@@ -118,7 +118,7 @@ jobs:
           cd rust
           cargo fmt -- --check
 
-            # ---------------- Java ----------------
+      # ---------------- Java ----------------
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -133,14 +133,28 @@ jobs:
         working-directory: java
         run: |
           echo "🔍 Running Checkstyle..."
-          mvn checkstyle:check
+          set +e
+          mvn -B checkstyle:check
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ Checkstyle found issues. See log above."
+            exit 1
+          else
+            echo "✅ No Checkstyle violations."
+          fi
 
-      - name: Run PMD 
+      - name: Run PMD
         working-directory: java
         run: |
-          echo "🔍 Running PMD "
-          mvn clean pmd:check
+          echo "🔍 Running PMD..."
+          set +e
+          mvn -B pmd:check -Dpmd.verbose=true
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ PMD found violations. See details above."
+            exit 1
+          else
+            echo "✅ No PMD violations."
+          fi
 
-
-      
 
