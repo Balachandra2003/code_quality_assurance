@@ -41,6 +41,29 @@ jobs:
           else
             cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
+          
+      - name: Install Google Test dependencies
+        run: |
+          echo "⚙️ Installing Google Test..."
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ make
+
+      - name: Build and Run Google Tests
+        run: |
+          echo "🧪 Running Google Tests..."
+          if [ -d "cpp" ]; then
+            cd cpp
+            if [ -f "CMakeLists.txt" ]; then
+              mkdir -p build && cd build
+              cmake ..
+              make
+              ctest --output-on-failure
+            else
+              echo "⚠️ No CMakeLists.txt found in cpp/, skipping gtest."
+            fi
+          else
+            echo "✅ No cpp directory found, skipping gtest."
+          fi
 
       # ---------------- Python ----------------
       - name: Set up Python
