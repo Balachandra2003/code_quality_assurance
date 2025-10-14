@@ -48,21 +48,34 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ make
 
-      - name: Build and Run Google Tests
+      # ---------------- C++ GTest ----------------
+      - name: 🧪 Run Google Tests on C++ files
         run: |
           echo "🧪 Running Google Tests..."
-          if [ -d "cpp" ]; then
-            if [ -f "CMakeLists.txt" ]; then
-              mkdir -p build && cd build
-              cmake ..
-              make
-              ctest --output-on-failure
-            else
-              echo "⚠️ No CMakeLists.txt found in cpp/, skipping gtest."
-            fi
+          cpp_files=$(find . -maxdepth 1 -name "*.cpp")
+      
+          if [ -z "$cpp_files" ]; then
+            echo "✅ No C++ files found for testing."
           else
-            echo "✅ No cpp directory found, skipping gtest."
+            sudo apt-get update
+            sudo apt-get install -y cmake g++ libgtest-dev
+      
+            # Build Google Test manually (no CMakeLists.txt needed yet)
+            cd /usr/src/gtest
+            sudo cmake .
+            sudo make
+            sudo cp lib/*.a /usr/lib
+      
+            cd $GITHUB_WORKSPACE
+            mkdir -p build && cd build
+      
+            # Compile all .cpp files with GTest
+            g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files -lgtest -lgtest_main -o runTests
+      
+            # Run the tests
+            ./runTests
           fi
+
 
       # ---------------- Python ----------------
       - name: Set up Python
