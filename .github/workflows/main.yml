@@ -48,16 +48,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y g++ make
 
-      # ---------------- C++ GTest ----------------
       - name: 🧪 Run Google Tests on C++ files
         working-directory: cpp
         run: |
           echo "🧪 Running Google Tests..."
-          cpp_files=$(find . -maxdepth 1 -name "*.cpp")
-          test_files=$(find . -maxdepth 1 -name "test_*.cpp")
+          cpp_files=$(find . -name "*.cpp" ! -name "test_*.cpp")
+          test_files=$(find . -name "test_*.cpp")
       
           if [ -z "$cpp_files" ] || [ -z "$test_files" ]; then
-            echo "✅ No C++ source or test files found."
+            echo "❌ No C++ source or test files found."
           else
             sudo apt-get update
             sudo apt-get install -y cmake g++ libgtest-dev make
@@ -72,11 +71,12 @@ jobs:
             mkdir -p build && cd build
       
             # Compile all source + test files with GTest
-            g++ -std=c++17 -I /usr/include/gtest -pthread ../*.cpp ../test_*.cpp -lgtest -lgtest_main -o runTests
+            g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files $test_files -lgtest -lgtest_main -o runTests
       
             # Run the tests
             ./runTests
           fi
+
 
       # ---------------- Python ----------------
       - name: Set up Python
