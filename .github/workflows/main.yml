@@ -44,22 +44,22 @@ jobs:
           
       - name: Install Google Test dependencies
         run: |
-          echo "⚙️ Installing Google Test..."
+          echo "Installing Google Test..."
           sudo apt-get update
           sudo apt-get install -y g++ make
 
       # ---------------- C++ GTest ----------------
-      - name: 🧪 Run Google Tests on C++ files
+      - name: Run Google Tests on C++ files
         run: |
           cd cpp
-          echo "🧪 Compiling and running Google Tests..."
+          echo "Compiling and running Google Tests..."
           cpp_files=$(find . -maxdepth 1 -name "*.cpp")
       
           if [ -z "$cpp_files" ]; then
-            echo "✅ No C++ files found for testing."
+            echo "No C++ files found for testing."
           else
             # Compile test files along with the source files
-            g++ -std=c++17 -I ./cpp/googletest/googletest/include -pthread cpp/BankApp.cpp cpp/test_bankapp.cpp -L ./cpp/googletest/googletest/lib -lgtest -lgtest_main -o cpp/test_bankapp.exe
+            g++ -std=c++17 -I ./cpp/googletest/googletest/include -pthread cpp/bankapp.cpp cpp/test_bankapp.cpp -L ./cpp/googletest/googletest/lib -lgtest -lgtest_main -o cpp/test_bankapp.exe
             ./cpp/test_bankapp.exe
 
             g++ -std=c++17 -I ./cpp/googletest/googletest/include -pthread cpp/chat_sentiment.cpp cpp/test_chat_sentiment.cpp -L ./cpp/googletest/googletest/lib -lgtest -lgtest_main -o cpp/test_chat_sentiment.exe
@@ -80,7 +80,7 @@ jobs:
           echo "🔍 Running pylint..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
-            echo "✅ No Python files found."
+            echo "No Python files found."
           else
             pylint $files
           fi
@@ -90,7 +90,7 @@ jobs:
           echo "🔍 Running flake8..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
-            echo "✅ No Python files found."
+            echo "No Python files found."
           else
             flake8 $files
           fi
