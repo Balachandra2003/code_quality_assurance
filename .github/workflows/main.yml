@@ -39,43 +39,31 @@ jobs:
           if [ -z "$files" ]; then
             echo "✅ No .cpp file found."
           else
-            cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
+            cppcheck --std=c++17 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
           fi
           
       - name: Install Google Test dependencies
         run: |
           echo "⚙️ Installing Google Test..."
           sudo apt-get update
-          sudo apt-get install -y cmake g++ make
+          sudo apt-get install -y g++ make
 
       # ---------------- C++ GTest ----------------
       - name: 🧪 Run Google Tests on C++ files
         run: |
-          echo "🧪 Running Google Tests..."
+          echo "🧪 Compiling and running Google Tests..."
           cpp_files=$(find . -maxdepth 1 -name "*.cpp")
       
           if [ -z "$cpp_files" ]; then
             echo "✅ No C++ files found for testing."
           else
-            sudo apt-get update
-            sudo apt-get install -y cmake g++ libgtest-dev
-      
-            # Build Google Test manually (no CMakeLists.txt needed yet)
-            cd /usr/src/gtest
-            sudo cmake .
-            sudo make
-            sudo cp lib/*.a /usr/lib
-      
-            cd $GITHUB_WORKSPACE
-            mkdir -p build && cd build
-      
-            # Compile all .cpp files with GTest
-            g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files -lgtest -lgtest_main -o runTests
-      
-            # Run the tests
-            ./runTests
-          fi
+            # Compile test files along with the source files
+            g++ -std=c++17 -I ./cpp/googletest/googletest/include -pthread cpp/BankApp.cpp cpp/test_bankapp.cpp -L ./cpp/googletest/googletest/lib -lgtest -lgtest_main -o cpp/test_bankapp.exe
+            ./cpp/test_bankapp.exe
 
+            g++ -std=c++17 -I ./cpp/googletest/googletest/include -pthread cpp/chat_sentiment.cpp cpp/test_chat_sentiment.cpp -L ./cpp/googletest/googletest/lib -lgtest -lgtest_main -o cpp/test_chat_sentiment.exe
+            ./cpp/test_chat_sentiment.exe
+          fi
 
       # ---------------- Python ----------------
       - name: Set up Python
@@ -168,5 +156,3 @@ jobs:
           else
             echo "✅ No PMD violations."
           fi
-
-
