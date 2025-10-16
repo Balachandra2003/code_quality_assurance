@@ -29,7 +29,6 @@
 # Compiled Static libraries
 *.lai
 *.la
-*.a
 *.lib
 
 # Executables
@@ -44,3 +43,9 @@
 
 # Rust build output
 target
+
+# -----------------------------
+# Keep build folder (un-ignore)
+!build/
+!build/**
+

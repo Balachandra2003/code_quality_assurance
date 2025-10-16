@@ -5,34 +5,22 @@
 class BankAccount {
  public:
     BankAccount(const std::string& name, double initialBalance)
-        : accountHolder(name), balance(initialBalance) {
-    }
+        : accountHolder(name), balance(initialBalance) {}
 
     void deposit(double amount) {
-        if (amount <= 0) {
-            std::cout << "Deposit amount must be positive!" << std::endl;
-            return;
-        }
+        if (amount <= 0) return;
         balance += amount;
-        std::cout << "Deposited : $" << amount
-                    << " -> balance: $" << balance << std::endl;
     }
 
     void withdraw(double amount) {
-        if (amount <= 0) {
-            std::cout << "Withdrawal amount must be positive!" << std::endl;
-            return;
-        }
-        if (amount > balance) {
-            std::cout << "Insufficient funds!" << std::endl;
-        } else {
-            balance -= amount;
-            std::cout << "Withdrawn: $" << amount
-                      << " -> Remaining balance: $" << balance << std::endl;
-        }
+        if (amount <= 0 || amount > balance) return;
+        balance -= amount;
     }
 
-    void displayBalance() {
+    double getBalance() const { return balance; }
+    std::string getAccountHolder() const { return accountHolder; }
+
+    void displayBalance() const {
         std::cout << "Account Holder: " << accountHolder
                   << ", Balance: $" << balance << std::endl;
     }
@@ -42,6 +30,8 @@ class BankAccount {
     double balance;
 };
 
+// Only define main if BANK_MAIN is defined
+#ifdef BANK_MAIN
 int main() {
     std::string name;
     std::cout << "Enter Your Name: ";
@@ -86,3 +76,4 @@ int main() {
 
     return 0;
 }
+#endif
