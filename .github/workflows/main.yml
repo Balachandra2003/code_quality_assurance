@@ -51,6 +51,7 @@ jobs:
       # ---------------- C++ GTest ----------------
       - name: 🧪 Run Google Tests on C++ files
         run: |
+          cd cpp
           echo "🧪 Compiling and running Google Tests..."
           cpp_files=$(find . -maxdepth 1 -name "*.cpp")
       
