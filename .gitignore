@@ -49,3 +49,6 @@ target
 !build/
 !build/**
 
+echo "cpp/googletest/" >> .gitignore
+echo "cpp/build/" >> .gitignore
+echo "*.exe" >> .gitignore
