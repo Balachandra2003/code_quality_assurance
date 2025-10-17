@@ -27,17 +27,9 @@ jobs:
           cmake ../googletest
           make
 
-      - name: Compile and run C++ tests
+      - name: Compile and Run C++ Google Tests
         run: |
           cd cpp
-          # Collect all source and test files
-          cpp_files=$(ls *.cpp)
-          if [ -z "$cpp_files" ]; then
-            echo "❌ No C++ files found."
-            exit 1
-          fi
-
-          # Compile with Google Test
           g++ -std=c++17 \
             -I googletest/googletest/include \
             -I googletest/googlemock/include \
@@ -45,7 +37,6 @@ jobs:
             bankapp.cpp test_bankapp.cpp \
             googletest/build/lib/libgtest.a googletest/build/lib/libgtest_main.a \
             -pthread -o runTests
-
-          # Run the tests
-          echo "🧪 Running Google Tests..."
+      
           ./runTests
+
