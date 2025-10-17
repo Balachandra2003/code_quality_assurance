@@ -1,48 +1,37 @@
-name: 🧪 C++ Google Test Pipeline
+name: C++ Google Test
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
 
 jobs:
-  run-gtest:
+  cpp-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🧪 Run Google Tests on C++ files
-        working-directory: cpp
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ make
+
+      - name: Build Google Test
         run: |
-          echo "🧪 Running Google Tests..."
-          
-          # Find all test files (any .cpp containing 'test' in name)
-          test_files=$(find . -maxdepth 1 -name "*test*.cpp")
-          
-          if [ -z "$test_files" ]; then
-            echo "❌ No C++ test (.cpp) files found in cpp directory."
-            exit 1
-          else
-            echo "🔍 Found test files: $test_files"
-      
-            # Install GTest and dependencies
-            sudo apt-get update
-            sudo apt-get install -y g++ cmake make libgtest-dev
-      
-            # Build GTest library
-            cd /usr/src/gtest
-            sudo cmake .
-            sudo make
-            sudo cp lib/*.a /usr/lib
-            cd $GITHUB_WORKSPACE/cpp
-      
-            # Compile the test files with Google Test
-            mkdir -p build && cd build
-            g++ -std=c++17 ../*test*.cpp ../*.cpp -I /usr/include/gtest -pthread -lgtest -lgtest_main -o runTests
-      
-            # Run the tests
-            echo "🧪 Executing tests..."
-            ./runTests
-          fi
+          cd cpp/googletest
+          mkdir -p build
+          cd build
+          cmake ..
+          make
+          cd ../../../
+
+      - name: Compile and Run Tests
+        run: |
+          cd cpp
+          g++ -std=c++17 \
+            -Igoogletest/include -Igooglemock/include \
+            chat_sentiment.cpp test_chat_sentiment.cpp \
+            googletest/build/lib/libgtest.a googletest/build/lib/libgtest_main.a \
+            -pthread -o runTests
+          ./runTests
