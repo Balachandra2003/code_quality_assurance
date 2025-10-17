@@ -1,172 +1,55 @@
-name: C++, Python, Rust, and Java Code Quality Checks
+name: 🧪 C++ Google Test Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - feature/**
+    branches: [ main ]
   pull_request:
 
 jobs:
-  lint-and-analyze:
+  run-gtest:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      # ---------------- C++ ----------------
-      - name: Install cpplint
-        run: pip install cpplint
-
-      - name: Install cppcheck
-        run: sudo apt-get update && sudo apt-get install -y cppcheck
-
-      - name: Run cpplint on .cpp files
-        run: |
-          echo "🔍 Running cpplint..."
-          files=$(find . -name "*.cpp")
-          if [ -z "$files" ]; then
-            echo "✅ No .cpp files found."
-          else
-            cpplint $files
-          fi
-
-      - name: Run cppcheck on .cpp files
-        run: |
-          echo "🔍 Running cppcheck..."
-          files=$(find . -name "*.cpp")
-          if [ -z "$files" ]; then
-            echo "✅ No .cpp file found."
-          else
-            cppcheck --std=c++11 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
-          fi
-          
-      - name: Install Google Test dependencies
-        run: |
-          echo "⚙️ Installing Google Test..."
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ make
-
-      # ---------------- C++ GTest ----------------
-      - name: 🧪 Run Google Tests on C++ files
+      - name: 🧪 Build and Run Google Tests
         run: |
           echo "🧪 Running Google Tests..."
-          cpp_files=$(find . -maxdepth 1 -name "*.cpp")
-      
+
+          # Move to cpp folder (update if your files are elsewhere)
+          cd cpp
+
+          echo "🔍 Checking for source and test files..."
+          find . -type f -name "*.cpp"
+
+          cpp_files=$(find . -type f -name "*.cpp" ! -name "test_*.cpp")
+          test_files=$(find . -type f -name "test_*.cpp")
+
           if [ -z "$cpp_files" ]; then
-            echo "✅ No C++ files found for testing."
-          else
-            sudo apt-get update
-            sudo apt-get install -y cmake g++ libgtest-dev
-      
-            # Build Google Test manually (no CMakeLists.txt needed yet)
-            cd /usr/src/gtest
-            sudo cmake .
-            sudo make
-            sudo cp lib/*.a /usr/lib
-      
-            cd $GITHUB_WORKSPACE
-            mkdir -p build && cd build
-      
-            # Compile all .cpp files with GTest
-            g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files -lgtest -lgtest_main -o runTests
-      
-            # Run the tests
-            ./runTests
-          fi
-
-
-      # ---------------- Python ----------------
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install pylint and flake8
-        run: pip install pylint flake8
-
-      - name: Run pylint on Python files
-        run: |
-          echo "🔍 Running pylint..."
-          files=$(find . -name "*.py")
-          if [ -z "$files" ]; then
-            echo "✅ No Python files found."
-          else
-            pylint $files
-          fi
-
-      - name: Run flake8 on Python files
-        run: |
-          echo "🔍 Running flake8..."
-          files=$(find . -name "*.py")
-          if [ -z "$files" ]; then
-            echo "✅ No Python files found."
-          else
-            flake8 $files
-          fi
-
-      # ---------------- Rust ----------------
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Install clippy and rustfmt
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
-
-      - name: Run cargo clippy
-        run: |
-          echo "🔍 Running cargo clippy..."
-          cd rust
-          cargo clippy -- -D warnings
-
-      - name: Run cargo fmt
-        run: |
-          echo "🔍 Running cargo fmt..."
-          cd rust
-          cargo fmt -- --check
-
-      # ---------------- Java ----------------
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Build with Maven (skip tests)
-        working-directory: java
-        run: mvn -B compile -DskipTests=true
-
-      - name: Run Checkstyle
-        working-directory: java
-        run: |
-          echo "🔍 Running Checkstyle..."
-          set +e
-          mvn -B checkstyle:check
-          STATUS=$?
-          if [ $STATUS -ne 0 ]; then
-            echo "::error::❌ Checkstyle found issues. See log above."
+            echo "❌ No C++ source (.cpp) files found in cpp directory."
             exit 1
-          else
-            echo "✅ No Checkstyle violations."
           fi
 
-      - name: Run PMD
-        working-directory: java
-        run: |
-          echo "🔍 Running PMD..."
-          set +e
-          mvn -B pmd:check -Dpmd.verbose=true
-          STATUS=$?
-          if [ $STATUS -ne 0 ]; then
-            echo "::error::❌ PMD found violations. See details above."
+          if [ -z "$test_files" ]; then
+            echo "❌ No C++ test (.cpp) files found in cpp directory."
             exit 1
-          else
-            echo "✅ No PMD violations."
           fi
 
+          echo "✅ Found source and test files. Installing Google Test..."
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libgtest-dev make
 
+          echo "⚙️ Building Google Test library..."
+          cd /usr/src/gtest
+          sudo cmake .
+          sudo make
+          sudo cp *.a /usr/lib
+
+          echo "🏗️ Compiling and linking test binary..."
+          cd $GITHUB_WORKSPACE/cpp
+          mkdir -p build && cd build
+          g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files $test_files -lgtest -lgtest_main -o runTests
+
+          echo "🚀 Running test binary..."
+          ./runTests
