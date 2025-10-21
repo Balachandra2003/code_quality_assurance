@@ -1,22 +1,17 @@
-#include "chat_logic.cpp"  // include only logic
-#include "googletest/googletest/include/gtest/gtest.h"
+#include <gtest/gtest.h>
+#include "chat_logic.h"
 
-TEST(ChatSentimentTest, PositiveSentiment) {
-    std::vector<std::string> msgs = {"I am happy", "You are great", "This is awesome"};
+TEST(SentimentTest, PositiveMessages) {
+    std::vector<std::string> msgs = {"I love this", "good job"};
     EXPECT_EQ(analyzeSentiment(msgs), 1);
 }
 
-TEST(ChatSentimentTest, NegativeSentiment) {
-    std::vector<std::string> msgs = {"I am sad", "This is bad", "I hate it"};
+TEST(SentimentTest, NegativeMessages) {
+    std::vector<std::string> msgs = {"bad experience", "worst day"};
     EXPECT_EQ(analyzeSentiment(msgs), -1);
 }
 
-TEST(ChatSentimentTest, NeutralSentiment) {
-    std::vector<std::string> msgs = {"hello", "how are you", "normal chat"};
+TEST(SentimentTest, NeutralMessages) {
+    std::vector<std::string> msgs = {"ok", "fine"};
     EXPECT_EQ(analyzeSentiment(msgs), 0);
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

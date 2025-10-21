@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "chat_logic.cpp"  // include logic
+#include "chat_logic.h"
 
 int main() {
     std::cout << "------ Chat Session Started ------" << std::endl;
