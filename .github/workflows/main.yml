@@ -17,15 +17,23 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y g++ cmake make libgtest-dev
+          sudo apt install -y g++ cmake make
 
+      # Step 3 — Clean old CMake cache (prevents Windows vs Linux path conflicts)
+      - name: Clean old CMake cache
+        run: |
+          rm -rf cpp/googletest/googletest/build
+          rm -f cpp/googletest/googletest/CMakeCache.txt
+
+      # Step 4 — Build Google Test
       - name: Build Google Test
         run: |
-          cd /usr/src/gtest
-          sudo cmake .
-          sudo make
-          sudo cp lib/*.a /usr/lib
+          cd cpp/googletest
+          mkdir -p build && cd build
+          cmake ../googletest
+          make
 
+      # Step 5 — Compile and link your project with Google Test
       - name: Compile and link test files
         run: |
           cd cpp
@@ -34,6 +42,7 @@ jobs:
             chat_logic.cpp test_chat_sentiment.cpp \
             -lgtest -lgtest_main -pthread -o runTests
 
+      # Step 6 — Run Google Tests
       - name: Run tests
         run: |
           cd cpp
