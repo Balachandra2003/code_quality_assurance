@@ -1,55 +1,53 @@
-name: 🧪 C++ Google Test Pipeline
+name: 🧪 Google Test (C++ Unit Tests)
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
 
 jobs:
-  run-gtest:
+  gtest:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      # Step 1 — Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🧪 Build and Run Google Tests
+      # Step 2 — Install required build tools
+      - name: Install dependencies
         run: |
-          echo "🧪 Running Google Tests..."
+          sudo apt update
+          sudo apt install -y g++ cmake make libgtest-dev
 
-          # Move to cpp folder (update if your files are elsewhere)
-          cd cpp
+      # Step 3 — Clean old CMake cache (prevents Windows vs Linux path conflicts)
+      - name: Clean old CMake cache
+        run: |
+          rm -rf cpp/googletest/googletest/build
+          rm -f cpp/googletest/googletest/CMakeCache.txt
 
-          echo "🔍 Checking for source and test files..."
-          find . -type f -name "*.cpp"
-
-          cpp_files=$(find . -type f -name "*.cpp" ! -name "test_*.cpp")
-          test_files=$(find . -type f -name "test_*.cpp")
-
-          if [ -z "$cpp_files" ]; then
-            echo "❌ No C++ source (.cpp) files found in cpp directory."
-            exit 1
-          fi
-
-          if [ -z "$test_files" ]; then
-            echo "❌ No C++ test (.cpp) files found in cpp directory."
-            exit 1
-          fi
-
-          echo "✅ Found source and test files. Installing Google Test..."
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ libgtest-dev make
-
-          echo "⚙️ Building Google Test library..."
-          cd /usr/src/gtest
-          sudo cmake .
-          sudo make
-          sudo cp *.a /usr/lib
-
-          echo "🏗️ Compiling and linking test binary..."
-          cd $GITHUB_WORKSPACE/cpp
+      # Step 4 — Build Google Test
+      - name: Build Google Test
+        run: |
+          cd cpp/googletest
           mkdir -p build && cd build
-          g++ -std=c++17 -I /usr/include/gtest -pthread $cpp_files $test_files -lgtest -lgtest_main -o runTests
+          cmake ../googletest
+          make
 
-          echo "🚀 Running test binary..."
+      # Step 5 — Compile and link your project with Google Test
+      - name: Compile and link test files
+        run: |
+          cd cpp
+          g++ -std=c++17 \
+            -Igoogletest/googletest/include \
+            chat_sentiment.cpp test_chat_sentiment.cpp \
+            googletest/build/lib/libgtest.a \
+            googletest/build/lib/libgtest_main.a \
+            -pthread -o runTests
+
+      # Step 6 — Run Google Tests
+      - name: Run tests
+        run: |
+          cd cpp
           ./runTests
