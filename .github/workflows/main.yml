@@ -1,4 +1,4 @@
-name:C++ Google Test CI
+name: 🧪 C++ Google Test CI
 
 on:
   push:
@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 — Checkout repository
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+
 
       # Step 2 — Install dependencies
       - name: Install dependencies
