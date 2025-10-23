@@ -1,6 +1,6 @@
 // copyright 2025 Bala
 #include "gtest/gtest.h"
-#include "cpp/bankapp.cpp"  // Include your bank.cpp directly
+#include "bankapp.cpp"  // Include your bank.cpp directly
 
 TEST(BankAccountTest, DepositAndWithdraw) {
     BankAccount acc("TestUser", 1000);
