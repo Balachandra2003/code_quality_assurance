@@ -1,4 +1,4 @@
-name: 🧪 Google Test (C++ Unit Tests)
+name:C++ Google Test CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  gtest:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,16 +15,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2 — Install required build tools
+      # Step 2 — Install dependencies
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y g++ cmake ninja-build libgtest-dev
+          sudo apt install -y g++ cmake make libgtest-dev
 
-      # Step 3 — Clean old CMake cache (prevents Windows vs Linux path conflicts)
-      - name: Clean old CMake cache
+      # Step 3 — Clean old CMake build cache
+      - name: Clean old build
         run: |
-          rm -rf cpp/googletest/googletest/build
+          rm -rf cpp/googletest/build
           rm -f cpp/googletest/googletest/CMakeCache.txt
 
       # Step 4 — Build Google Test
@@ -32,22 +32,34 @@ jobs:
         run: |
           cd cpp/googletest
           mkdir -p build && cd build
-          cmake -G Ninja ../googletest
-          cmake --build .
+          cmake ../googletest
+          make
 
-      # Step 5 — Compile and link your project with Google Test
-      - name: Compile and link test files
+      # Step 5 — Compile Chat Sentiment tests
+      - name: Compile Chat Sentiment Tests
         run: |
           cd cpp
           g++ -std=c++17 \
             -Igoogletest/googletest/include \
-            chat_sentiment.cpp test_chat_sentiment.cpp \
-            googletest/build/lib/libgtest.a \
-            googletest/build/lib/libgtest_main.a \
-            -pthread -o runTests
+            chat_logic.cpp chat_sentiment.cpp test_chat_sentiment.cpp \
+            googletest/build/lib/libgtest.a googletest/build/lib/libgtest_main.a \
+            -pthread -o chatSentimentTests
 
-      # Step 6 — Run Google Tests
-      - name: Run tests
+      # Step 6 — Compile Bank App tests
+      - name: Compile Bank App Tests
         run: |
           cd cpp
-          ./runTests
+          g++ -std=c++17 \
+            -Igoogletest/googletest/include \
+            bank_logic.cpp bank_app.cpp test_bankapp.cpp \
+            googletest/build/lib/libgtest.a googletest/build/lib/libgtest_main.a \
+            -pthread -o bankAppTests
+
+      # Step 7 — Run all tests
+      - name: Run All Tests
+        run: |
+          cd cpp
+          echo "===== Running Chat Sentiment Tests ====="
+          ./chatSentimentTests
+          echo "===== Running Bank App Tests ====="
+          ./bankAppTests
