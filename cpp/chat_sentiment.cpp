@@ -1,7 +1,8 @@
+// copyright 2025 Bala
 #include <iostream>
 #include <string>
 #include <vector>
-#include "chat_logic.h"
+#include "cpp/chat_logic.h"
 
 int main() {
     std::cout << "------ Chat Session Started ------" << std::endl;
