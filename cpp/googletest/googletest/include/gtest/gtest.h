@@ -1610,8 +1610,6 @@ GTEST_API_ AssertionResult DoubleNearPredFormat(const char* expr1,
                                                 double val1, double val2,
                                                 double abs_error);
 
-using GoogleTest_NotSupported_OnFunctionReturningNonVoid = void;
-
 // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
 // A class that enables one to stream messages to assertion macros
 class GTEST_API_ AssertHelper {
@@ -1623,8 +1621,7 @@ class GTEST_API_ AssertHelper {
 
   // Message assignment is a semantic trick to enable assertion
   // streaming; see the GTEST_MESSAGE_ macro below.
-  GoogleTest_NotSupported_OnFunctionReturningNonVoid operator=(
-      const Message& message) const;
+  void operator=(const Message& message) const;
 
  private:
   // We put our data in a struct so that the size of the AssertHelper class can
@@ -1696,7 +1693,7 @@ class WithParamInterface {
 
   // The current parameter value. Is also available in the test fixture's
   // constructor.
-  [[nodiscard]] static const ParamType& GetParam() {
+  static const ParamType& GetParam() {
     GTEST_CHECK_(parameter_ != nullptr)
         << "GetParam() can only be called inside a value-parameterized test "
         << "-- did you intend to write TEST_P instead of TEST_F?";

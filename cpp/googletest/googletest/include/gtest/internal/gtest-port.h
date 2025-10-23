@@ -198,8 +198,21 @@
 //                                        suppressed (constant conditional).
 //   GTEST_INTENTIONAL_CONST_COND_POP_  - finish code section where MSVC C4127
 //                                        is suppressed.
+//   GTEST_INTERNAL_HAS_ANY - for enabling UniversalPrinter<std::any> or
+//                            UniversalPrinter<absl::any> specializations.
+//                            Always defined to 0 or 1.
+//   GTEST_INTERNAL_HAS_OPTIONAL - for enabling UniversalPrinter<std::optional>
+//   or
+//                                 UniversalPrinter<absl::optional>
+//                                 specializations. Always defined to 0 or 1.
 //   GTEST_INTERNAL_HAS_STD_SPAN - for enabling UniversalPrinter<std::span>
 //                                 specializations. Always defined to 0 or 1
+//   GTEST_INTERNAL_HAS_STRING_VIEW - for enabling Matcher<std::string_view> or
+//                                    Matcher<absl::string_view>
+//                                    specializations. Always defined to 0 or 1.
+//   GTEST_INTERNAL_HAS_VARIANT - for enabling UniversalPrinter<std::variant> or
+//                                UniversalPrinter<absl::variant>
+//                                specializations. Always defined to 0 or 1.
 //   GTEST_USE_OWN_FLAGFILE_FLAG_ - Always defined to 0 or 1.
 //   GTEST_HAS_CXXABI_H_ - Always defined to 0 or 1.
 //   GTEST_CAN_STREAM_RESULTS_ - Always defined to 0 or 1.
@@ -1385,9 +1398,9 @@ class GTEST_API_ Mutex {
   Mutex();
   ~Mutex();
 
-  void lock();
+  void Lock();
 
-  void unlock();
+  void Unlock();
 
   // Does nothing if the current thread holds the mutex. Otherwise, crashes
   // with high probability.
@@ -1424,9 +1437,9 @@ class GTEST_API_ Mutex {
 // "MutexLock l(&mu)".  Hence the typedef trick below.
 class GTestMutexLock {
  public:
-  explicit GTestMutexLock(Mutex* mutex) : mutex_(mutex) { mutex_->lock(); }
+  explicit GTestMutexLock(Mutex* mutex) : mutex_(mutex) { mutex_->Lock(); }
 
-  ~GTestMutexLock() { mutex_->unlock(); }
+  ~GTestMutexLock() { mutex_->Unlock(); }
 
  private:
   Mutex* const mutex_;
@@ -1641,14 +1654,14 @@ class ThreadLocal : public ThreadLocalBase {
 class MutexBase {
  public:
   // Acquires this mutex.
-  void lock() {
+  void Lock() {
     GTEST_CHECK_POSIX_SUCCESS_(pthread_mutex_lock(&mutex_));
     owner_ = pthread_self();
     has_owner_ = true;
   }
 
   // Releases this mutex.
-  void unlock() {
+  void Unlock() {
     // Since the lock is being released the owner_ field should no longer be
     // considered valid. We don't protect writing to has_owner_ here, as it's
     // the caller's responsibility to ensure that the current thread holds the
@@ -1716,9 +1729,9 @@ class Mutex : public MutexBase {
 // "MutexLock l(&mu)".  Hence the typedef trick below.
 class GTestMutexLock {
  public:
-  explicit GTestMutexLock(MutexBase* mutex) : mutex_(mutex) { mutex_->lock(); }
+  explicit GTestMutexLock(MutexBase* mutex) : mutex_(mutex) { mutex_->Lock(); }
 
-  ~GTestMutexLock() { mutex_->unlock(); }
+  ~GTestMutexLock() { mutex_->Unlock(); }
 
  private:
   MutexBase* const mutex_;
@@ -1864,8 +1877,8 @@ class GTEST_API_ ThreadLocal {
 class Mutex {
  public:
   Mutex() {}
-  void lock() {}
-  void unlock() {}
+  void Lock() {}
+  void Unlock() {}
   void AssertHeld() const {}
 };
 
@@ -2322,11 +2335,71 @@ const char* StringFromGTestEnv(const char* flag, const char* default_val);
 }  // namespace internal
 }  // namespace testing
 
-#if GTEST_INTERNAL_HAVE_CPP_ATTRIBUTE(clang::annotate)
-#define GTEST_INTERNAL_DEPRECATE_AND_INLINE(msg) \
-  [[deprecated(msg), clang::annotate("inline-me")]]
+#ifdef GTEST_HAS_ABSL
+// Always use absl::any for UniversalPrinter<> specializations if googletest
+// is built with absl support.
+#define GTEST_INTERNAL_HAS_ANY 1
+#include "absl/types/any.h"
+namespace testing {
+namespace internal {
+using Any = ::absl::any;
+}  // namespace internal
+}  // namespace testing
 #else
-#define GTEST_INTERNAL_DEPRECATE_AND_INLINE(msg) [[deprecated(msg)]]
+#if defined(__cpp_lib_any) || (GTEST_INTERNAL_HAS_INCLUDE(<any>) &&        \
+                               GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L && \
+                               (!defined(_MSC_VER) || GTEST_HAS_RTTI))
+// Otherwise for C++17 and higher use std::any for UniversalPrinter<>
+// specializations.
+#define GTEST_INTERNAL_HAS_ANY 1
+#include <any>
+namespace testing {
+namespace internal {
+using Any = ::std::any;
+}  // namespace internal
+}  // namespace testing
+// The case where absl is configured NOT to alias std::any is not
+// supported.
+#endif  // __cpp_lib_any
+#endif  // GTEST_HAS_ABSL
+
+#ifndef GTEST_INTERNAL_HAS_ANY
+#define GTEST_INTERNAL_HAS_ANY 0
+#endif
+
+#ifdef GTEST_HAS_ABSL
+// Always use absl::optional for UniversalPrinter<> specializations if
+// googletest is built with absl support.
+#define GTEST_INTERNAL_HAS_OPTIONAL 1
+#include "absl/types/optional.h"
+namespace testing {
+namespace internal {
+template <typename T>
+using Optional = ::absl::optional<T>;
+inline ::absl::nullopt_t Nullopt() { return ::absl::nullopt; }
+}  // namespace internal
+}  // namespace testing
+#else
+#if defined(__cpp_lib_optional) || (GTEST_INTERNAL_HAS_INCLUDE(<optional>) && \
+                                    GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L)
+// Otherwise for C++17 and higher use std::optional for UniversalPrinter<>
+// specializations.
+#define GTEST_INTERNAL_HAS_OPTIONAL 1
+#include <optional>
+namespace testing {
+namespace internal {
+template <typename T>
+using Optional = ::std::optional<T>;
+inline ::std::nullopt_t Nullopt() { return ::std::nullopt; }
+}  // namespace internal
+}  // namespace testing
+// The case where absl is configured NOT to alias std::optional is not
+// supported.
+#endif  // __cpp_lib_optional
+#endif  // GTEST_HAS_ABSL
+
+#ifndef GTEST_INTERNAL_HAS_OPTIONAL
+#define GTEST_INTERNAL_HAS_OPTIONAL 0
 #endif
 
 #if defined(__cpp_lib_span) || (GTEST_INTERNAL_HAS_INCLUDE(<span>) && \
@@ -2368,6 +2441,38 @@ using StringView = ::std::string_view;
 
 #ifndef GTEST_INTERNAL_HAS_STRING_VIEW
 #define GTEST_INTERNAL_HAS_STRING_VIEW 0
+#endif
+
+#ifdef GTEST_HAS_ABSL
+// Always use absl::variant for UniversalPrinter<> specializations if googletest
+// is built with absl support.
+#define GTEST_INTERNAL_HAS_VARIANT 1
+#include "absl/types/variant.h"
+namespace testing {
+namespace internal {
+template <typename... T>
+using Variant = ::absl::variant<T...>;
+}  // namespace internal
+}  // namespace testing
+#else
+#if defined(__cpp_lib_variant) || (GTEST_INTERNAL_HAS_INCLUDE(<variant>) && \
+                                   GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L)
+// Otherwise for C++17 and higher use std::variant for UniversalPrinter<>
+// specializations.
+#define GTEST_INTERNAL_HAS_VARIANT 1
+#include <variant>
+namespace testing {
+namespace internal {
+template <typename... T>
+using Variant = ::std::variant<T...>;
+}  // namespace internal
+}  // namespace testing
+// The case where absl is configured NOT to alias std::variant is not supported.
+#endif  // __cpp_lib_variant
+#endif  // GTEST_HAS_ABSL
+
+#ifndef GTEST_INTERNAL_HAS_VARIANT
+#define GTEST_INTERNAL_HAS_VARIANT 0
 #endif
 
 #if (defined(__cpp_lib_three_way_comparison) || \

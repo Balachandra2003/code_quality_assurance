@@ -1796,24 +1796,11 @@ struct SetArrayArgumentAction {
 };
 
 template <size_t k>
-class DeleteArgAction {
- public:
+struct DeleteArgAction {
   template <typename... Args>
   void operator()(const Args&... args) const {
-    DoDelete(std::get<k>(std::tie(args...)));
+    delete std::get<k>(std::tie(args...));
   }
-
- private:
-  template <typename T>
-  static void DoDelete(T* ptr) {
-    delete ptr;
-  }
-
-  template <typename T>
-  [[deprecated(
-      "DeleteArg<N> used for a non-pointer argument, it was likely migrated "
-      "to a smart pointer type. This action should be removed.")]]
-  static void DoDelete(T&) {}
 };
 
 template <typename Ptr>
@@ -1878,13 +1865,6 @@ struct RethrowAction {
 //   EXPECT_CALL(mock, Foo("abc", _, _)).WillOnce(Invoke(DistanceToOrigin));
 //   EXPECT_CALL(mock, Bar(5, _, _)).WillOnce(Invoke(DistanceToOrigin));
 typedef internal::IgnoredValue Unused;
-
-// Deprecated single-argument DoAll.
-template <typename Action>
-GTEST_INTERNAL_DEPRECATE_AND_INLINE("Avoid using DoAll() for single actions")
-typename std::decay<Action>::type DoAll(Action&& action) {
-  return std::forward<Action>(action);
-}
 
 // Creates an action that does actions a1, a2, ..., sequentially in
 // each invocation. All but the last action will have a readonly view of the
@@ -2051,11 +2031,10 @@ PolymorphicAction<internal::SetErrnoAndReturnAction<T>> SetErrnoAndReturn(
 // Various overloads for Invoke().
 
 // Legacy function.
+// Actions can now be implicitly constructed from callables. No need to create
+// wrapper objects.
 // This function exists for backwards compatibility.
 template <typename FunctionImpl>
-GTEST_INTERNAL_DEPRECATE_AND_INLINE(
-    "Actions can now be implicitly constructed from callables. No need to "
-    "create wrapper objects using Invoke().")
 typename std::decay<FunctionImpl>::type Invoke(FunctionImpl&& function_impl) {
   return std::forward<FunctionImpl>(function_impl);
 }
