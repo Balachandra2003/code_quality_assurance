@@ -1,5 +1,4 @@
-#include <vector>
-#include <string>
+#include "chat_logic.h"
 
 int analyzeSentiment(const std::vector<std::string>& messages) {
     std::vector<std::string> positive = {"good", "happy", "great", "love", "nice", "awesome"};

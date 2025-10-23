@@ -11,46 +11,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 — Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2 — Install required build tools
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y g++ cmake make
 
-      # Step 3 — Clean up old build files (avoids cache conflicts)
+      # Step 3 — Clean old CMake cache (prevents Windows vs Linux path conflicts)
       - name: Clean old CMake cache
         run: |
-          rm -rf cpp/googletest/build
-          rm -f cpp/googletest/CMakeCache.txt
+          rm -rf cpp/googletest/googletest/build
+          rm -f cpp/googletest/googletest/CMakeCache.txt
 
-      # Step 4 — Build GoogleTest from source
-      - name: Build GoogleTest
+      # Step 4 — Build Google Test
+      - name: Build Google Test
         run: |
-          cd cpp
-          rm -rf googletest
-          git clone https://github.com/google/googletest.git
-          cd googletest
-          mkdir build && cd build
-          cmake .. -DCMAKE_CXX_STANDARD=17
-          make -j$(nproc)
+          cd cpp/googletest
+          mkdir -p build && cd build
+          cmake ../googletest
+          make
 
-      # Step 5 — Compile and link your test with GoogleTest
+      # Step 5 — Compile and link your project with Google Test
       - name: Compile and link test files
         run: |
           cd cpp
           g++ -std=c++17 \
-            -Igoogletest/googletest/include \
-            chat_sentiment.cpp test_chat_sentiment.cpp \
-            googletest/build/lib/libgtest.a \
-            googletest/build/lib/libgtest_main.a \
-            -pthread -o runTests
+            -I/usr/include \
+            chat_logic.cpp test_chat_sentiment.cpp \
+            -lgtest -lgtest_main -pthread -o runTests
 
-      # Step 6 — Run the tests
-      - name: Run Google Tests
+      # Step 6 — Run Google Tests
+      - name: Run tests
         run: |
           cd cpp
           ./runTests
