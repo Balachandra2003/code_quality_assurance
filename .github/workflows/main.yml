@@ -14,17 +14,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y g++ cmake make libgtest-dev
+      name: C++, Python, Rust, and Java Code Quality Checks
 
-      - name: Clean old CMake cache
-        run: |
-          rm -rf cpp/googletest/build
-          rm -f cpp/googletest/CMakeCache.txt
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
 
-      - name: Build GoogleTest
+jobs:
+  lint-and-analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ---------------- C++ ----------------
+      - name: Install cpplint
+        run: pip install cpplint
+
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run cpplint on .cpp files
+        run: |
+          echo "🔍 Running cpplint..."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp files found."
+          else
+            cpplint $files
+          fi
+
+      - name: Run cppcheck on .cpp files
+        run: |
+          echo "🔍 Running cppcheck..."
+          files=$(find . -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No .cpp file found."
+          else
+            cppcheck --std=c++17 --enable=all --suppress=missingIncludeSystem --error-exitcode=1 $files
+          fi
+          
+      - name: Install Google Test dependencies
+        run: |
+          echo "Installing Google Test..."
+          sudo apt-get update
+          sudo apt-get install -y g++ make cmake libgtest-dev
+
+      - name: Build Google Test from source
         run: |
           cd cpp
           rm -rf googletest
@@ -34,28 +74,114 @@ jobs:
           cmake .. -DCMAKE_CXX_STANDARD=17
           make -j$(nproc)
 
-      - name: Compile and link ChatSentiment tests
+      - name: 🧪 Compile and run C++ tests (ChatSentiment + BankApp)
+        working-directory: cpp
         run: |
-          cd cpp
-          g++ -std=c++17 \
-            -I/usr/include \
-            chat_logic.cpp test_chat_sentiment.cpp \
-            -lgtest -lgtest_main -pthread -o runChatTests
+          echo "🧪 Running all Google Tests..."
+          cpp_files=$(find . -name "*.cpp" ! -name "test_*.cpp")
+          test_files=$(find . -name "test_*.cpp")
+      
+          if [ -z "$cpp_files" ] || [ -z "$test_files" ]; then
+            echo "❌ No C++ source or test files found."
+          else
+            # Compile all sources + test files
+            g++ -std=c++17 \
+              -I /usr/include \
+              $cpp_files $test_files \
+              -lgtest -lgtest_main -pthread -o runTests
+      
+            # Run the tests
+            ./runTests
 
-      - name: Run ChatSentiment tests
-        run: |
-          cd cpp
-          ./runChatTests
+      # ---------------- Python ----------------
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-      - name: Compile and link BankApp tests
-        run: |
-          cd cpp
-          g++ -std=c++17 \
-            -I/usr/include \
-            bankapp.cpp test_bankapp.cpp \
-            -lgtest -lgtest_main -pthread -o runBankTests
+      - name: Install pylint and flake8
+        run: pip install pylint flake8
 
-      - name: Run BankApp tests
+      - name: Run pylint on Python files
         run: |
-          cd cpp
-          ./runBankTests
+          echo "🔍 Running pylint..."
+          files=$(find . -name "*.py")
+          if [ -z "$files" ]; then
+            echo "No Python files found."
+          else
+            pylint $files
+          fi
+
+      - name: Run flake8 on Python files
+        run: |
+          echo "🔍 Running flake8..."
+          files=$(find . -name "*.py")
+          if [ -z "$files" ]; then
+            echo "No Python files found."
+          else
+            flake8 $files
+          fi
+
+      # ---------------- Rust ----------------
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install clippy and rustfmt
+        run: |
+          rustup component add clippy
+          rustup component add rustfmt
+
+      - name: Run cargo clippy
+        run: |
+          echo "🔍 Running cargo clippy..."
+          cd rust
+          cargo clippy -- -D warnings
+
+      - name: Run cargo fmt
+        run: |
+          echo "🔍 Running cargo fmt..."
+          cd rust
+          cargo fmt -- --check
+
+      # ---------------- Java ----------------
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build with Maven (skip tests)
+        working-directory: java
+        run: mvn -B compile -DskipTests=true
+
+      - name: Run Checkstyle
+        working-directory: java
+        run: |
+          echo "🔍 Running Checkstyle..."
+          set +e
+          mvn -B checkstyle:check
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ Checkstyle found issues. See log above."
+            exit 1
+          else
+            echo "✅ No Checkstyle violations."
+          fi
+
+      - name: Run PMD
+        working-directory: java
+        run: |
+          echo "🔍 Running PMD..."
+          set +e
+          mvn -B pmd:check -Dpmd.verbose=true
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::❌ PMD found violations. See details above."
+            exit 1
+          else
+            echo "✅ No PMD violations."
+          fi
+
