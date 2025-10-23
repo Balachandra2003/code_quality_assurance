@@ -1,18 +1,30 @@
-#include "chat_logic.h"
+// Copyright 2025 Bala
+
+#include <string>
+#include <vector>
+
+#include "cpp/chat_logic.h"  // Example: include directory name, remove semicolon
 
 int analyzeSentiment(const std::vector<std::string>& messages) {
-    std::vector<std::string> positive = {"good", "happy", "great", "love", "nice", "awesome"};
-    std::vector<std::string> negative = {"bad", "sad", "angry", "hate", "worst", "ugly"};
+    std::vector<std::string> positive = {
+        "good", "happy", "great", "love", "nice", "awesome"
+    };
+    std::vector<std::string> negative = {
+        "bad", "sad", "angry", "hate", "worst", "ugly"
+    };
 
-    int posCount = 0, negCount = 0;
+    int posCount = 0;
+    int negCount = 0;
     for (const auto& msg : messages) {
-        for (const auto& word : positive)
+        for (const auto& word : positive) {
             if (msg.find(word) != std::string::npos) posCount++;
-        for (const auto& word : negative)
+        }
+        for (const auto& word : negative) {
             if (msg.find(word) != std::string::npos) negCount++;
+        }
     }
 
     if (posCount > negCount) return 1;
-    else if (negCount > posCount) return -1;
-    else return 0;
+    if (negCount > posCount) return -1;
+    return 0;
 }

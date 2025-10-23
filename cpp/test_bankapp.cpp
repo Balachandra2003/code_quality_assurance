@@ -1,5 +1,6 @@
+// copyright 2025 Bala
 #include "gtest/gtest.h"
-#include "bankapp.cpp"  // Include your bank.cpp directly
+#include "cpp/bankapp.cpp"  // Include your bank.cpp directly
 
 TEST(BankAccountTest, DepositAndWithdraw) {
     BankAccount acc("TestUser", 1000);
@@ -10,7 +11,7 @@ TEST(BankAccountTest, DepositAndWithdraw) {
 }
 
 TEST(BankAccountTest, WithdrawInsufficient) {
-    BankAccount acc("TestUser", 100); 
+    BankAccount acc("TestUser", 100);
     acc.withdraw(200);
     EXPECT_EQ(acc.getBalance(), 100);  // Balance should remain the same
 }
