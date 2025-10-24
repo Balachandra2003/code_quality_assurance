@@ -18,7 +18,7 @@ void BankAccount::withdraw(double amount) {
 
 double BankAccount::getBalance() const { return balance; }
 
-std::string BankAccount::getAccountHolder() const { return accountHolder; }
+// std::string BankAccount::getAccountHolder() const { return accountHolder; }
 
 void BankAccount::displayBalance() const {
     std::cout << "Account Holder: " << accountHolder
