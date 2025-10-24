@@ -62,7 +62,7 @@ jobs:
           cd cpp
           g++ -std=c++17 \
             -I/usr/include \
-            bank_app.cpp test_bankapp.cpp \
+            bankapp.cpp test_bankapp.cpp \
             -lgtest -lgtest_main -pthread -o runBankTests
 
       - name: Run BankApp tests
