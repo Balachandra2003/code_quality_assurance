@@ -81,6 +81,7 @@ jobs:
 
       - name: Run pylint on Python files
         run: |
+          cd python
           echo "🔍 Running pylint..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
@@ -91,6 +92,7 @@ jobs:
 
       - name: Run flake8 on Python files
         run: |
+          cd python
           echo "🔍 Running flake8..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
