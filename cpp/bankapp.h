@@ -1,6 +1,6 @@
 // Copyright 2025 Balu
-#ifndef BANK_APP_H_
-#define BANK_APP_H_
+#ifndef BANKAPP_H_
+#define BANKAPP_H_
 
 #include <iostream>
 #include <string>
