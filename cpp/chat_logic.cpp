@@ -20,13 +20,14 @@ int analyzeSentiment(const std::vector<std::string>& messages) {
     for (const auto& msg : messages) {
         posCount += std::count_if(
             positive.begin(), positive.end(),
-            [&](const std::string& word) { return msg.find(word) != std::string::npos; }
-        );
-
+            [&](const std::string& word) {
+                return msg.find(word) != std::string::npos;
+            });
         negCount += std::count_if(
             negative.begin(), negative.end(),
-            [&](const std::string& word) { return msg.find(word) != std::string::npos; }
-        );
+            [&](const std::string& word) {
+                return msg.find(word) != std::string::npos;
+            });
     }
 
     if (posCount > negCount) return 1;
