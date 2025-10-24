@@ -40,7 +40,7 @@ jobs:
           if [ -z "$files" ]; then
             echo "✅ No C++ files found."
           else
-            cppcheck --std=c++17 --enable=all \
+            cppcheck --language=c++ --std=c++17 --enable=all \
               --suppress=missingIncludeSystem \
               --include=cpp --error-exitcode=1 $files
           fi
