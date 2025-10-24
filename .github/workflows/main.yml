@@ -21,6 +21,29 @@ jobs:
 
       - name: Install cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
+        
+      - name: Run cpplint on .cpp files
+        run: |
+          cd cpp
+          echo "🔍 Running cpplint..."
+          files=$(find cpp -name "*.cpp" -o -name "*.h")
+          if [ -z "$files" ]; then
+            echo "✅ No C++ files found."
+          else
+            cpplint --root=cpp --filter=-build/include_subdir $files
+          fi
+
+      - name: Run cppcheck on .cpp files
+        run: |
+          cd cpp
+          echo "🔍 Running cppcheck..."
+          files=$(find cpp -name "*.cpp")
+          if [ -z "$files" ]; then
+            echo "✅ No C++ file found."
+          else
+            cppcheck --std=c++17 --enable=all --suppress=missingIncludeSystem --include=cpp --error-exitcode=1 $files
+          fi
+
 
       
       # ---------------- Gtest ----------------
