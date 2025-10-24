@@ -1,36 +1,28 @@
 // copyright 2025 Balu
-#include <iostream>
-#include <string>
+#include "bankapp.h"
 
-class BankAccount {
- public:
-    BankAccount(const std::string& name, double initialBalance)
-        : accountHolder(name), balance(initialBalance) {}
+BankAccount::BankAccount(const std::string& name, double initialBalance)
+    : accountHolder(name), balance(initialBalance) {}
 
-    void deposit(double amount) {
-        if (amount <= 0) return;
-        balance += amount;
-    }
+void BankAccount::deposit(double amount) {
+    if (amount <= 0) return;
+    balance += amount;
+}
 
-    void withdraw(double amount) {
-        if (amount <= 0 || amount > balance) return;
-        balance -= amount;
-    }
+void BankAccount::withdraw(double amount) {
+    if (amount <= 0 || amount > balance) return;
+    balance -= amount;
+}
 
-    double getBalance() const { return balance; }
-    std::string getAccountHolder() const { return accountHolder; }
+double BankAccount::getBalance() const { return balance; }
 
-    void displayBalance() const {
-        std::cout << "Account Holder: " << accountHolder
-                  << ", Balance: $" << balance << std::endl;
-    }
+std::string BankAccount::getAccountHolder() const { return accountHolder; }
 
- private:
-    std::string accountHolder;
-    double balance;
-};
+void BankAccount::displayBalance() const {
+    std::cout << "Account Holder: " << accountHolder
+              << ", Balance: $" << balance << std::endl;
+}
 
-// Only define main if BANK_MAIN is defined
 #ifdef BANK_MAIN
 int main() {
     std::string name;
