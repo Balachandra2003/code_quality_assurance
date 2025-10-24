@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "cpp/chat_logic.h"  // Example: include directory name, remove semicolon
+#include "chat_logic.h"
 
 int analyzeSentiment(const std::vector<std::string>& messages) {
     std::vector<std::string> positive = {
