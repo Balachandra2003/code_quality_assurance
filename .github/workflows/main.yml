@@ -25,7 +25,7 @@ jobs:
       - name: Run cpplint on C++ files (excluding gtest)
         run: |
           echo "🔍 Running cpplint..."
-          files=$(find cpp -type f \( -name "*.cpp" -o -name "*.h" \) ! -path "*/gtest/*")
+          files=$(find cpp -type f \( -name "*.cpp" -o -name "*.h" \) ! -path "*/googletest/*")
           if [ -z "$files" ]; then
             echo "✅ No C++ files found."
           else
@@ -36,7 +36,7 @@ jobs:
       - name: Run cppcheck on C++ files (excluding gtest)
         run: |
           echo "🔍 Running cppcheck..."
-          files=$(find cpp -type f -name "*.cpp" ! -path "*/gtest/*")
+          files=$(find cpp -type f -name "*.cpp" ! -path "*/googletest/*")
           if [ -z "$files" ]; then
             echo "✅ No C++ files found."
           else
