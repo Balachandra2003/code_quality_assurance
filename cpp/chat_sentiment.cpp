@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "cpp/chat_logic.h"
+#include "chat_logic.h"
 
 int main() {
     std::cout << "------ Chat Session Started ------" << std::endl;
