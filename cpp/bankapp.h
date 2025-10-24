@@ -20,4 +20,4 @@ class BankAccount {
     double balance;
 };
 
-#endif  // BANK_APP_H_
+#endif  // BANKAPP_H_

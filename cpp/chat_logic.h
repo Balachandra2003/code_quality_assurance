@@ -7,4 +7,4 @@
 
 int analyzeSentiment(const std::vector<std::string>& messages);
 
-#endif  // CPP_CHAT_LOGIC_H_
+#endif  // CHAT_LOGIC_H_
