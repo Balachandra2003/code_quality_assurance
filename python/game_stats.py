@@ -26,7 +26,7 @@ def create_sample_data():
             "Valorant", "Valorant", "CS:GO", "Valorant", "Valorant",
             "CS:GO", "Valorant", "Valorant", "CS:GO", "Valorant"
         ],
-        "kills": [204, 178, 310, 250, 190, 275, 230, 200, 260, 225],
+        "kills": [204, 178, 310, 250, 190, 275, 230, 200, 260, 225], 
         "deaths": [98, 110, 190, 120, 130, 150, 115, 100, 160, 120],
         "assists": [65, 80, 120, 95, 70, 110, 90, 85, 100, 75],
         "matches": [25, 22, 30, 26, 21, 28, 27, 23, 29, 25],
