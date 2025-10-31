@@ -22,23 +22,23 @@ jobs:
       - name: Install cppcheck
         run: sudo apt-get update && sudo apt-get install -y cppcheck
         
-      - name: Run cpplint on C++ files (excluding gtest)
+      - name: Run cpplint on C++ files
         run: |
-          echo "🔍 Running cpplint..."
+          echo "Running cpplint..."
           files=$(find cpp -type f \( -name "*.cpp" -o -name "*.h" \) ! -path "*/googletest/*")
           if [ -z "$files" ]; then
-            echo "✅ No C++ files found."
+            echo "No C++ files found."
           else
             cpplint --root=cpp --filter=-build/include_subdir $files
           fi
 
 
-      - name: Run cppcheck on C++ files (excluding gtest)
+      - name: Run cppcheck on C++ files
         run: |
-          echo "🔍 Running cppcheck..."
+          echo "Running cppcheck..."
           files=$(find cpp -type f -name "*.cpp" ! -path "*/googletest/*")
           if [ -z "$files" ]; then
-            echo "✅ No C++ files found."
+            echo "No C++ files found."
           else
             cppcheck --language=c++ --std=c++17 --enable=all \
               --suppress=missingIncludeSystem \
@@ -107,7 +107,7 @@ jobs:
       - name: Run pylint on Python files
         run: |
           cd python
-          echo "🔍 Running pylint..."
+          echo "Running pylint..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
             echo "No Python files found."
@@ -118,7 +118,7 @@ jobs:
       - name: Run flake8 on Python files
         run: |
           cd python
-          echo "🔍 Running flake8..."
+          echo "Running flake8..."
           files=$(find . -name "*.py")
           if [ -z "$files" ]; then
             echo "No Python files found."
@@ -140,13 +140,13 @@ jobs:
 
       - name: Run cargo clippy
         run: |
-          echo "🔍 Running cargo clippy..."
+          echo "Running cargo clippy..."
           cd rust
           cargo clippy -- -D warnings
 
       - name: Run cargo fmt
         run: |
-          echo "🔍 Running cargo fmt..."
+          echo "Running cargo fmt..."
           cd rust
           cargo fmt -- --check
 
@@ -157,34 +157,34 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build with Maven (skip tests)
+      - name: Build with Maven
         working-directory: java
         run: mvn -B compile -DskipTests=true
 
       - name: Run Checkstyle
         working-directory: java
         run: |
-          echo "🔍 Running Checkstyle..."
+          echo "Running Checkstyle..."
           set +e
           mvn -B checkstyle:check
           STATUS=$?
           if [ $STATUS -ne 0 ]; then
-            echo "::error::❌ Checkstyle found issues. See log above."
+            echo "::error::Checkstyle found issues. See log above."
             exit 1
           else
-            echo "✅ No Checkstyle violations."
+            echo "No Checkstyle violations."
           fi
 
       - name: Run PMD
         working-directory: java
         run: |
-          echo "🔍 Running PMD..."
+          echo "Running PMD..."
           set +e
           mvn -B pmd:check -Dpmd.verbose=true
           STATUS=$?
           if [ $STATUS -ne 0 ]; then
-            echo "::error::❌ PMD found violations. See details above."
+            echo "::error::PMD found violations. See details above."
             exit 1
           else
-            echo "✅ No PMD violations."
+            echo "No PMD violations."
           fi
