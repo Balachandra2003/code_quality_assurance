@@ -104,7 +104,7 @@ jobs:
       - name: Install pylint and flake8
         run: pip install pylint flake8
 
-      - name: Install Streamlit, Pandas, Plotly
+      - name: Install Streamlit, Pandas, Plotly 
         run: pip install streamlit pandas plotly
 
       - name: Run pylint on Python files
