@@ -8,7 +8,7 @@
 
 int analyzeSentiment(const std::vector<std::string>& messages) {
     const std::vector<std::string> positive = {
-        "good", "happy", "great", "love", "nice", "awesome"
+        "good", "happy", "great", "love", "nicer", "awesome"
     };
     const std::vector<std::string> negative = {
         "bad", "sad", "angry", "hate", "worst", "ugly"
