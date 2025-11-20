@@ -77,7 +77,7 @@ jobs:
             chat_logic.cpp test_chat_sentiment.cpp \
             -lgtest -lgtest_main -pthread -o runChatTests
 
-      - name: Run ChatSentiment tests
+      - name: Run gtest on ChatSentiment app
         run: |
           cd cpp
           ./runChatTests
@@ -90,7 +90,7 @@ jobs:
             bankapp.cpp test_bankapp.cpp \
             -lgtest -lgtest_main -pthread -o runBankTests
 
-      - name: Run BankApp tests
+      - name: Run gtest on BankApp 
         run: |
           cd cpp
           ./runBankTests
