@@ -49,7 +49,7 @@ def display_kpis(filtered_df, selected_game, selected_year):
     total_matches = filtered_df["matches"].sum()
     total_wins = filtered_df["wins"].sum()
     avg_assists = filtered_df["assists"].mean()
-    win_rate = (total_wins / total_matches) * 100 if total_matches else 0  
+    win_rate = (total_wins / total_matches) * 100 if total_matches else 0
 
     col1.metric("Average Kills", f"{avg_kills:.1f}")
     col2.metric("Win Rate", f"{win_rate:.1f}%")
