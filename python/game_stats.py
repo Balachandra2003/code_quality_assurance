@@ -12,7 +12,7 @@ import plotly.express as px
 
 
 def create_sample_data():
-    """Create a sample DataFrame with 10 rows of eSports statistics."""   
+    """Create a sample DataFrame with 10 rows of eSports statistics."""
     data = {
         "player": [
             "Ace", "Blaze", "Shadow", "Nova", "Crimson",
